@@ -6,16 +6,16 @@ import (
 )
 
 type Course struct {
-	ID          uuid.UUID `db:"id"`
-	CreatedAt   time.Time `db:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at"`
-	Title       string    `db:"title"`
-	Description string    `db:"description"`
-	Price       int64     `db:"price"`
+	ID          uuid.UUID `db:"id" json:"id"`
+	CreatedAt   time.Time `db:"created_at" json:"createdAt"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updatedAt"`
+	Title       string    `db:"title" json:"title"`
+	Description string    `db:"description" json:"description"`
+	Price       int64     `db:"price" json:"price"`
 }
 
 type NewCourse struct {
-	Title       string `db:"title"`
-	Description string `db:"description"`
-	Price       int64  `db:"price"`
+	Title       string `db:"title" json:"title"`
+	Description string `db:"description" json:"description"`
+	Price       int64  `db:"price" json:"price"`
 }

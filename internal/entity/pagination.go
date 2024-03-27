@@ -1,6 +1,6 @@
 package entity
 
 type Pagination struct {
-	Offset int64
-	Limit  int64
+	Offset int64 `json:"offset"`
+	Limit  int64 `json:"limit"`
 }

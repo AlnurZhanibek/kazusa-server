@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"kazusa-server/internal/database"
 	"kazusa-server/internal/entity"
+	"kazusa-server/internal/handler"
 	"kazusa-server/internal/repository"
+	"kazusa-server/internal/server"
 	"kazusa-server/internal/service"
 	"log"
 )
@@ -15,6 +17,11 @@ func main() {
 
 	courseRepo := repository.NewCourseRepo(db)
 	courseService := service.NewCourseService(courseRepo)
+	courseHandler := handler.NewCourseHandler(courseService)
+
+	server.Start(&server.Handlers{
+		CourseHandler: courseHandler,
+	})
 
 	result, err := courseService.Read(entity.Pagination{
 		Offset: 0,
