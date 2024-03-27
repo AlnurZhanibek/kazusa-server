@@ -32,7 +32,7 @@ func (r *CourseRepository) Create(course entity.NewCourse) (bool, error) {
 
 	_, err := r.db.Exec(insertStatement, newID, course.Title, course.Description, course.Price)
 	if err != nil {
-		return false, fmt.Errorf("error when adding new course: %v", err)
+		return false, fmt.Errorf("course repo error when adding new course: %v", err)
 	}
 
 	return true, nil
@@ -43,7 +43,7 @@ func (r *CourseRepository) Read(pagination entity.Pagination) ([]entity.Course, 
 
 	rows, err := r.db.Query(selectStatement, pagination.Limit, pagination.Offset)
 	if err != nil {
-		return nil, fmt.Errorf("error on reading courses: %v", err)
+		return nil, fmt.Errorf("course repo error on reading courses: %v", err)
 	}
 	defer rows.Close()
 
@@ -52,7 +52,7 @@ func (r *CourseRepository) Read(pagination entity.Pagination) ([]entity.Course, 
 
 		err = rows.Scan(&course.ID, &course.CreatedAt, &course.UpdatedAt, &course.Title, &course.Description, &course.Price)
 		if err != nil {
-			return nil, fmt.Errorf("error on scanning a course: %v", err)
+			return nil, fmt.Errorf("course repo error on scanning a course: %v", err)
 		}
 
 		courses = append(courses, course)
@@ -60,7 +60,7 @@ func (r *CourseRepository) Read(pagination entity.Pagination) ([]entity.Course, 
 
 	err = rows.Err()
 	if err != nil {
-		return nil, fmt.Errorf("error on rows when reading: %v", err)
+		return nil, fmt.Errorf("course repo error on rows when reading: %v", err)
 	}
 
 	return courses, nil
