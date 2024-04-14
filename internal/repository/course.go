@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	insertStatement = "insert into courses(id, title, description, price) values(uuid_to_bin(?), ?, ?, ?)"
-	selectStatement = "select id, created_at, updated_at, title, description, price from courses limit ? offset ?"
+	courseInsertStatement = "insert into courses(id, title, description, price) values(uuid_to_bin(?), ?, ?, ?)"
+	courseSelectStatement = "select id, created_at, updated_at, title, description, price from courses limit ? offset ?"
 )
 
 type CourseRepositoryImplementation interface {
@@ -30,7 +30,7 @@ func NewCourseRepo(db *sql.DB) *CourseRepository {
 func (r *CourseRepository) Create(course entity.NewCourse) (bool, error) {
 	newID := uuid.New()
 
-	_, err := r.db.Exec(insertStatement, newID, course.Title, course.Description, course.Price)
+	_, err := r.db.Exec(courseInsertStatement, newID, course.Title, course.Description, course.Price)
 	if err != nil {
 		return false, fmt.Errorf("course repo error when adding new course: %v", err)
 	}
@@ -41,7 +41,7 @@ func (r *CourseRepository) Create(course entity.NewCourse) (bool, error) {
 func (r *CourseRepository) Read(pagination entity.Pagination) ([]entity.Course, error) {
 	courses := make([]entity.Course, 0, pagination.Limit)
 
-	rows, err := r.db.Query(selectStatement, pagination.Limit, pagination.Offset)
+	rows, err := r.db.Query(courseSelectStatement, pagination.Limit, pagination.Offset)
 	if err != nil {
 		return nil, fmt.Errorf("course repo error on reading courses: %v", err)
 	}

@@ -19,3 +19,12 @@ type NewCourse struct {
 	Description string `db:"description" json:"description"`
 	Price       int64  `db:"price" json:"price"`
 }
+
+type CourseFilters struct {
+	ID uuid.UUID `db:"id" json:"id"`
+}
+
+type CourseReadRequest struct {
+	Filters    CourseFilters `json:"filters"`
+	Pagination Pagination    `json:"pagination"`
+}

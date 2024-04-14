@@ -10,6 +10,7 @@ import (
 
 type Handlers struct {
 	CourseHandler *handler.CourseHandler
+	ModuleHandler *handler.ModuleHandler
 }
 
 func Start(handlers *Handlers) {
@@ -19,6 +20,15 @@ func Start(handlers *Handlers) {
 			handlers.CourseHandler.Read(w, r)
 		case http.MethodPost:
 			handlers.CourseHandler.Create(w, r)
+		}
+	})
+
+	http.HandleFunc("/module", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handlers.ModuleHandler.Read(w, r)
+		case http.MethodPost:
+			handlers.ModuleHandler.Create(w, r)
 		}
 	})
 
