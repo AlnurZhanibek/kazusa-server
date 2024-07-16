@@ -27,6 +27,18 @@ type LoginResponse struct {
 	Error string `json:"error,omitempty"`
 }
 
+// Login example
+//
+//	@Summary		Login a user
+//	@Description	login user
+//	@ID				login
+//	@Accept			json
+//	@Produce		json
+//	@Param			email		body		string	true "email"
+//	@Param			password	body		string 	true "password"
+//	@Success		200			{object}	handler.LoginResponse
+//	@Failure		400			{object}	handler.LoginResponse
+//	@Router			/login [post]
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 
@@ -78,6 +90,21 @@ type RegisterResponse struct {
 	Error string `json:"error,omitempty"`
 }
 
+// Register example
+//
+//	@Summary		Register a user
+//	@Description	register user
+//	@ID				register
+//	@Accept			json
+//	@Produce		json
+//	@Param			name					body		string	true "name"
+//	@Param			email					body		string	true "email"
+//	@Param			phone					body		string 	false "phone"
+//	@Param			password				body		string 	true "password"
+//	@Param			passwordConfirmation	body		string	true "password confirm"
+//	@Success		200			{object}	handler.LoginResponse
+//	@Failure		400			{object}	handler.LoginResponse
+//	@Router			/register [post]
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 

@@ -20,6 +20,17 @@ func NewCourseHandler(service service.CourseServiceImplementation) *CourseHandle
 	return &CourseHandler{service: service}
 }
 
+// Create course
+//
+//	@Summary		Create course
+//	@Description	create course
+//	@ID				course.create
+//	@Accept			json
+//	@Produce		json
+//	@Param			request		body		entity.NewCourse	true "new course body"
+//	@Success		200			{boolean} boolean ok
+//	@Failure		400			{boolean} boolean ok
+//	@Router			/course [post]
 func (h *CourseHandler) Create(w http.ResponseWriter, r *http.Request) {
 	newCourse := entity.NewCourse{}
 
@@ -47,6 +58,17 @@ func (h *CourseHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Read course
+//
+//	@Summary		Read courses
+//	@Description	read courses
+//	@ID				course.read
+//	@Accept			json
+//	@Produce		json
+//	@Param			request		body		entity.CourseReadRequest	true "course read request"
+//	@Success		200			{array}	entity.Course
+//	@Failure		404			{boolean} boolean ok
+//	@Router			/course [get]
 func (h *CourseHandler) Read(w http.ResponseWriter, r *http.Request) {
 	pagination := entity.Pagination{}
 

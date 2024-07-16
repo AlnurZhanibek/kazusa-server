@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "kazusa-server/docs"
 	"kazusa-server/internal/database"
 	"kazusa-server/internal/handler"
 	"kazusa-server/internal/repository"
@@ -8,6 +9,20 @@ import (
 	"kazusa-server/internal/service"
 )
 
+// @title Swagger KazUSA API
+// @version 1.0
+// @description This is the KazUSA server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://kazusa.kz
+// @contact.email aln.zh.621@gmail.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host kazusa.kz
+// @BasePath /
 func main() {
 	db := database.New()
 	defer db.Close()

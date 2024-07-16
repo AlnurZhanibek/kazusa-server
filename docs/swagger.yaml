@@ -1,0 +1,266 @@
+basePath: /
+definitions:
+  internal_handler.LoginResponse:
+    properties:
+      error:
+        type: string
+      ok:
+        type: boolean
+    type: object
+  kazusa-server_internal_entity.Course:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      price:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  kazusa-server_internal_entity.CourseFilters:
+    properties:
+      id:
+        type: string
+    type: object
+  kazusa-server_internal_entity.CourseReadRequest:
+    properties:
+      filters:
+        $ref: '#/definitions/kazusa-server_internal_entity.CourseFilters'
+      pagination:
+        $ref: '#/definitions/kazusa-server_internal_entity.Pagination'
+    type: object
+  kazusa-server_internal_entity.Module:
+    properties:
+      content:
+        type: string
+      courseId:
+        type: string
+      createdAt:
+        type: string
+      durationMinutes:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  kazusa-server_internal_entity.ModuleFilters:
+    properties:
+      courseId:
+        type: string
+      id:
+        type: string
+    type: object
+  kazusa-server_internal_entity.ModuleReadRequest:
+    properties:
+      filters:
+        $ref: '#/definitions/kazusa-server_internal_entity.ModuleFilters'
+      pagination:
+        $ref: '#/definitions/kazusa-server_internal_entity.Pagination'
+    type: object
+  kazusa-server_internal_entity.NewCourse:
+    properties:
+      description:
+        type: string
+      price:
+        type: integer
+      title:
+        type: string
+    type: object
+  kazusa-server_internal_entity.NewModule:
+    properties:
+      content:
+        type: string
+      courseId:
+        type: string
+      durationMinutes:
+        type: integer
+      name:
+        type: string
+    type: object
+  kazusa-server_internal_entity.Pagination:
+    properties:
+      limit:
+        type: integer
+      offset:
+        type: integer
+    type: object
+host: kazusa.kz
+info:
+  contact:
+    email: aln.zh.621@gmail.com
+    name: API Support
+    url: http://kazusa.kz
+  description: This is the KazUSA server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger KazUSA API
+  version: "1.0"
+paths:
+  /course:
+    get:
+      consumes:
+      - application/json
+      description: read courses
+      operationId: course.read
+      parameters:
+      - description: course read request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/kazusa-server_internal_entity.CourseReadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/kazusa-server_internal_entity.Course'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            type: boolean
+      summary: Read courses
+    post:
+      consumes:
+      - application/json
+      description: create module
+      operationId: module.create
+      parameters:
+      - description: new module body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/kazusa-server_internal_entity.NewModule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Create module
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: login user
+      operationId: login
+      parameters:
+      - description: email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handler.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handler.LoginResponse'
+      summary: Login a user
+  /module:
+    get:
+      consumes:
+      - application/json
+      description: read modules
+      operationId: module.read
+      parameters:
+      - description: module read request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/kazusa-server_internal_entity.ModuleReadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/kazusa-server_internal_entity.Module'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            type: boolean
+      summary: Read modules
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: register user
+      operationId: register
+      parameters:
+      - description: name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: phone
+        in: body
+        name: phone
+        schema:
+          type: string
+      - description: password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      - description: password confirm
+        in: body
+        name: passwordConfirmation
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handler.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handler.LoginResponse'
+      summary: Register a user
+swagger: "2.0"

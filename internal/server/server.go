@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"kazusa-server/internal/handler"
 	"log"
 	"net/http"
@@ -15,6 +16,8 @@ type Handlers struct {
 }
 
 func Start(handlers *Handlers) {
+	port := os.Getenv("HTTP_PORT")
+
 	http.HandleFunc("/course", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -51,7 +54,11 @@ func Start(handlers *Handlers) {
 		}
 	})
 
-	err := http.ListenAndServe(fmt.Sprintf(":%v", os.Getenv("HTTP_PORT")), nil)
+	http.HandleFunc("/swagger", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:"+port+"/swagger/doc.json"),
+	))
+
+	err := http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 	if err != nil {
 		log.Fatalf("server error: %v", err)
 	}

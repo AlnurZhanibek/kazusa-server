@@ -21,6 +21,17 @@ func NewModuleHandler(service service.ModuleServiceImplementation) *ModuleHandle
 	return &ModuleHandler{service: service}
 }
 
+// Create module
+//
+//	@Summary		Create module
+//	@Description	create module
+//	@ID				module.create
+//	@Accept			json
+//	@Produce		json
+//	@Param			request		body		entity.NewModule	true "new module body"
+//	@Success		200			{boolean} boolean ok
+//	@Failure		400			{boolean} boolean ok
+//	@Router			/course [post]
 func (h *ModuleHandler) Create(w http.ResponseWriter, r *http.Request) {
 	newModule := entity.NewModule{}
 
@@ -48,6 +59,17 @@ func (h *ModuleHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Read module
+//
+//	@Summary		Read modules
+//	@Description	read modules
+//	@ID				module.read
+//	@Accept			json
+//	@Produce		json
+//	@Param			request		body		entity.ModuleReadRequest	true "module read request"
+//	@Success		200			{array}	entity.Module
+//	@Failure		404			{boolean} boolean ok
+//	@Router			/module [get]
 func (h *ModuleHandler) Read(w http.ResponseWriter, r *http.Request) {
 	filters := entity.ModuleFilters{}
 
