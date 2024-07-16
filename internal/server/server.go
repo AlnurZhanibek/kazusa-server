@@ -11,6 +11,7 @@ import (
 type Handlers struct {
 	CourseHandler *handler.CourseHandler
 	ModuleHandler *handler.ModuleHandler
+	AuthHandler   *handler.AuthHandler
 }
 
 func Start(handlers *Handlers) {
@@ -29,6 +30,24 @@ func Start(handlers *Handlers) {
 			handlers.ModuleHandler.Read(w, r)
 		case http.MethodPost:
 			handlers.ModuleHandler.Create(w, r)
+		}
+	})
+
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			handlers.AuthHandler.Login(w, r)
+		}
+	})
+
+	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			handlers.AuthHandler.Register(w, r)
+		}
+	})
+
+	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			handlers.AuthHandler.Logout(w, r)
 		}
 	})
 

@@ -20,3 +20,13 @@ create table if not exists modules (
     duration_minutes integer not null,
     foreign key (course_id) references courses (id)
 );
+
+create table if not exists users (
+    id binary(16) not null,
+    email varchar(256) not null unique,
+    name varchar(256) not null,
+    phone varchar(256),
+    password varchar(256) not null,
+    role varchar(256) not null,
+    primary key (id)
+)

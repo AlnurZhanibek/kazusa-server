@@ -20,8 +20,13 @@ func main() {
 	moduleService := service.NewModuleService(moduleRepo)
 	moduleHandler := handler.NewModuleHandler(moduleService)
 
+	userRepo := repository.NewUserRepo(db)
+	authService := service.NewAuthService(userRepo)
+	authHandler := handler.NewAuthHandler(authService)
+
 	server.Start(&server.Handlers{
 		CourseHandler: courseHandler,
 		ModuleHandler: moduleHandler,
+		AuthHandler:   authHandler,
 	})
 }
