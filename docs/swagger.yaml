@@ -1,6 +1,33 @@
 basePath: /
 definitions:
+  internal_handler.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
   internal_handler.LoginResponse:
+    properties:
+      error:
+        type: string
+      ok:
+        type: boolean
+    type: object
+  internal_handler.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      passwordConfirmation:
+        type: string
+      phone:
+        type: string
+    type: object
+  internal_handler.RegisterResponse:
     properties:
       error:
         type: string
@@ -164,18 +191,12 @@ paths:
       description: login user
       operationId: login
       parameters:
-      - description: email
+      - description: login body
         in: body
-        name: email
+        name: request
         required: true
         schema:
-          type: string
-      - description: password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/internal_handler.LoginRequest'
       produces:
       - application/json
       responses:
@@ -222,45 +243,22 @@ paths:
       description: register user
       operationId: register
       parameters:
-      - description: name
+      - description: register body
         in: body
-        name: name
+        name: request
         required: true
         schema:
-          type: string
-      - description: email
-        in: body
-        name: email
-        required: true
-        schema:
-          type: string
-      - description: phone
-        in: body
-        name: phone
-        schema:
-          type: string
-      - description: password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
-      - description: password confirm
-        in: body
-        name: passwordConfirmation
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/internal_handler.RegisterRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handler.LoginResponse'
+            $ref: '#/definitions/internal_handler.RegisterResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handler.LoginResponse'
+            $ref: '#/definitions/internal_handler.RegisterResponse'
       summary: Register a user
 swagger: "2.0"

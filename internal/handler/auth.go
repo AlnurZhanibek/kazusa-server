@@ -34,8 +34,7 @@ type LoginResponse struct {
 //	@ID				login
 //	@Accept			json
 //	@Produce		json
-//	@Param			email		body		string	true "email"
-//	@Param			password	body		string 	true "password"
+//	@Param			request		body	 	handler.LoginRequest 	true 	"login body"
 //	@Success		200			{object}	handler.LoginResponse
 //	@Failure		400			{object}	handler.LoginResponse
 //	@Router			/login [post]
@@ -97,16 +96,14 @@ type RegisterResponse struct {
 //	@ID				register
 //	@Accept			json
 //	@Produce		json
-//	@Param			name					body		string	true "name"
-//	@Param			email					body		string	true "email"
-//	@Param			phone					body		string 	false "phone"
-//	@Param			password				body		string 	true "password"
-//	@Param			passwordConfirmation	body		string	true "password confirm"
-//	@Success		200			{object}	handler.LoginResponse
-//	@Failure		400			{object}	handler.LoginResponse
+//	@Param			request		body	 	handler.RegisterRequest 	true 	"register body"
+//	@Success		200			{object}	handler.RegisterResponse
+//	@Failure		400			{object}	handler.RegisterResponse
 //	@Router			/register [post]
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	var credentials RegisterRequest
 	decoder := json.NewDecoder(r.Body)

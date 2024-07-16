@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"kazusa-server/internal/handler"
 	"log"
@@ -18,7 +19,9 @@ type Handlers struct {
 func Start(handlers *Handlers) {
 	port := os.Getenv("HTTP_PORT")
 
-	http.HandleFunc("/course", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/course", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			handlers.CourseHandler.Read(w, r)
@@ -27,7 +30,7 @@ func Start(handlers *Handlers) {
 		}
 	})
 
-	http.HandleFunc("/module", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/module", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			handlers.ModuleHandler.Read(w, r)
@@ -36,29 +39,31 @@ func Start(handlers *Handlers) {
 		}
 	})
 
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			handlers.AuthHandler.Login(w, r)
 		}
 	})
 
-	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			handlers.AuthHandler.Register(w, r)
 		}
 	})
 
-	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			handlers.AuthHandler.Logout(w, r)
 		}
 	})
 
-	http.HandleFunc("/swagger", httpSwagger.Handler(
+	mux.HandleFunc("/swagger", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:"+port+"/swagger/doc.json"),
 	))
 
-	err := http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
+	muxHandler := cors.Default().Handler(mux)
+
+	err := http.ListenAndServe(fmt.Sprintf(":%v", port), muxHandler)
 	if err != nil {
 		log.Fatalf("server error: %v", err)
 	}
