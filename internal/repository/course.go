@@ -5,16 +5,17 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"kazusa-server/internal/entity"
+	"strings"
 )
 
 const (
 	courseInsertStatement = "insert into courses(id, title, description, price) values(uuid_to_bin(?), ?, ?, ?)"
-	courseSelectStatement = "select id, created_at, updated_at, title, description, price from courses limit ? offset ?"
+	courseSelectStatement = "select id, created_at, updated_at, title, description, price from courses"
 )
 
 type CourseRepositoryImplementation interface {
 	Create(course entity.NewCourse) (bool, error)
-	Read(pagination entity.Pagination) ([]entity.Course, error)
+	Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error)
 }
 
 type CourseRepository struct {
@@ -38,10 +39,26 @@ func (r *CourseRepository) Create(course entity.NewCourse) (bool, error) {
 	return true, nil
 }
 
-func (r *CourseRepository) Read(pagination entity.Pagination) ([]entity.Course, error) {
+func (r *CourseRepository) Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error) {
 	courses := make([]entity.Course, 0, pagination.Limit)
 
-	rows, err := r.db.Query(courseSelectStatement, pagination.Limit, pagination.Offset)
+	statement := courseSelectStatement
+	args := make([]any, 0, 3)
+
+	if filters.ID != uuid.Nil {
+		statement += " where "
+		statement += "id = uuid_to_bin(?), "
+		args = append(args, filters.ID)
+	}
+
+	statement = strings.TrimSuffix(statement, ", ")
+
+	statement += " limit ? offset ?"
+
+	args = append(args, pagination.Limit)
+	args = append(args, pagination.Offset)
+
+	rows, err := r.db.Query(statement, args...)
 	if err != nil {
 		return nil, fmt.Errorf("course repo error on reading courses: %v", err)
 	}

@@ -2,9 +2,11 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"kazusa-server/internal/entity"
 	"kazusa-server/internal/service"
 	"net/http"
+	"strconv"
 )
 
 type CourseHandlerImplementation interface {
@@ -65,20 +67,37 @@ func (h *CourseHandler) Create(w http.ResponseWriter, r *http.Request) {
 //	@ID				course.read
 //	@Accept			json
 //	@Produce		json
-//	@Param			request		body		entity.CourseReadRequest	true "course read request"
+//	@Param			offset		query		int64	true "offset"
+//	@Param			offset		query		int64	true "limit"
+//	@Param			offset		query		string	false "id"
 //	@Success		200			{array}	entity.Course
 //	@Failure		404			{boolean} boolean ok
 //	@Router			/course [get]
 func (h *CourseHandler) Read(w http.ResponseWriter, r *http.Request) {
-	pagination := entity.Pagination{}
-
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&pagination)
+	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	}
+	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 	}
 
-	courses, err := h.service.Read(pagination)
+	id := r.URL.Query().Get("id")
+
+	filters := entity.CourseFilters{
+		ID: uuid.Nil,
+	}
+
+	if id != "" {
+		filters.ID = uuid.MustParse(id)
+	}
+
+	courses, err := h.service.Read(entity.Pagination{
+		Offset: offset,
+		Limit:  limit,
+	}, filters)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

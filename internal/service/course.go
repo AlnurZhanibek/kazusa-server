@@ -8,7 +8,7 @@ import (
 
 type CourseServiceImplementation interface {
 	Create(course entity.NewCourse) (bool, error)
-	Read(pagination entity.Pagination) ([]entity.Course, error)
+	Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error)
 }
 
 type CourseService struct {
@@ -28,8 +28,8 @@ func (s *CourseService) Create(course entity.NewCourse) (bool, error) {
 	return ok, nil
 }
 
-func (s *CourseService) Read(pagination entity.Pagination) ([]entity.Course, error) {
-	courses, err := s.repo.Read(pagination)
+func (s *CourseService) Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error) {
+	courses, err := s.repo.Read(pagination, filters)
 	if err != nil {
 		return nil, fmt.Errorf("course service create error: %v", err)
 	}

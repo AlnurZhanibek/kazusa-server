@@ -1,5 +1,39 @@
 basePath: /
 definitions:
+  Course:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      price:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - createdAt
+    - description
+    - id
+    - price
+    - title
+    type: object
+  NewCourse:
+    properties:
+      description:
+        type: string
+      price:
+        type: integer
+      title:
+        type: string
+    required:
+    - description
+    - price
+    - title
+    type: object
   internal_handler.LoginRequest:
     properties:
       email:
@@ -34,33 +68,6 @@ definitions:
       ok:
         type: boolean
     type: object
-  kazusa-server_internal_entity.Course:
-    properties:
-      createdAt:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      price:
-        type: integer
-      title:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  kazusa-server_internal_entity.CourseFilters:
-    properties:
-      id:
-        type: string
-    type: object
-  kazusa-server_internal_entity.CourseReadRequest:
-    properties:
-      filters:
-        $ref: '#/definitions/kazusa-server_internal_entity.CourseFilters'
-      pagination:
-        $ref: '#/definitions/kazusa-server_internal_entity.Pagination'
-    type: object
   kazusa-server_internal_entity.Module:
     properties:
       content:
@@ -91,15 +98,6 @@ definitions:
         $ref: '#/definitions/kazusa-server_internal_entity.ModuleFilters'
       pagination:
         $ref: '#/definitions/kazusa-server_internal_entity.Pagination'
-    type: object
-  kazusa-server_internal_entity.NewCourse:
-    properties:
-      description:
-        type: string
-      price:
-        type: integer
-      title:
-        type: string
     type: object
   kazusa-server_internal_entity.NewModule:
     properties:
@@ -140,12 +138,20 @@ paths:
       description: read courses
       operationId: course.read
       parameters:
-      - description: course read request
-        in: body
-        name: request
+      - description: offset
+        in: query
+        name: offset
         required: true
-        schema:
-          $ref: '#/definitions/kazusa-server_internal_entity.CourseReadRequest'
+        type: integer
+      - description: limit
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: id
+        in: query
+        name: offset
+        type: string
       produces:
       - application/json
       responses:
@@ -153,7 +159,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/kazusa-server_internal_entity.Course'
+              $ref: '#/definitions/Course'
             type: array
         "404":
           description: Not Found
