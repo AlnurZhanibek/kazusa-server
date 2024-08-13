@@ -8,6 +8,10 @@ definitions:
         type: string
       id:
         type: string
+      modules:
+        items:
+          $ref: '#/definitions/Module'
+        type: array
       price:
         type: integer
       title:
@@ -21,6 +25,30 @@ definitions:
     - price
     - title
     type: object
+  Module:
+    properties:
+      content:
+        type: string
+      courseId:
+        type: string
+      createdAt:
+        type: string
+      durationMinutes:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - content
+    - courseId
+    - createdAt
+    - durationMinutes
+    - id
+    - name
+    type: object
   NewCourse:
     properties:
       description:
@@ -33,6 +61,22 @@ definitions:
     - description
     - price
     - title
+    type: object
+  NewModule:
+    properties:
+      content:
+        type: string
+      courseId:
+        type: string
+      durationMinutes:
+        type: integer
+      name:
+        type: string
+    required:
+    - content
+    - courseId
+    - durationMinutes
+    - name
     type: object
   internal_handler.LoginRequest:
     properties:
@@ -68,55 +112,6 @@ definitions:
       ok:
         type: boolean
     type: object
-  kazusa-server_internal_entity.Module:
-    properties:
-      content:
-        type: string
-      courseId:
-        type: string
-      createdAt:
-        type: string
-      durationMinutes:
-        type: integer
-      id:
-        type: string
-      name:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  kazusa-server_internal_entity.ModuleFilters:
-    properties:
-      courseId:
-        type: string
-      id:
-        type: string
-    type: object
-  kazusa-server_internal_entity.ModuleReadRequest:
-    properties:
-      filters:
-        $ref: '#/definitions/kazusa-server_internal_entity.ModuleFilters'
-      pagination:
-        $ref: '#/definitions/kazusa-server_internal_entity.Pagination'
-    type: object
-  kazusa-server_internal_entity.NewModule:
-    properties:
-      content:
-        type: string
-      courseId:
-        type: string
-      durationMinutes:
-        type: integer
-      name:
-        type: string
-    type: object
-  kazusa-server_internal_entity.Pagination:
-    properties:
-      limit:
-        type: integer
-      offset:
-        type: integer
-    type: object
 host: kazusa.kz
 info:
   contact:
@@ -145,12 +140,12 @@ paths:
         type: integer
       - description: limit
         in: query
-        name: offset
+        name: limit
         required: true
         type: integer
       - description: id
         in: query
-        name: offset
+        name: id
         type: string
       produces:
       - application/json
@@ -177,7 +172,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/kazusa-server_internal_entity.NewModule'
+          $ref: '#/definitions/NewModule'
       produces:
       - application/json
       responses:
@@ -222,12 +217,22 @@ paths:
       description: read modules
       operationId: module.read
       parameters:
-      - description: module read request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/kazusa-server_internal_entity.ModuleReadRequest'
+      - description: id
+        in: query
+        name: id
+        type: string
+      - description: course_id
+        in: query
+        name: course_id
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -235,7 +240,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/kazusa-server_internal_entity.Module'
+              $ref: '#/definitions/Module'
             type: array
         "404":
           description: Not Found

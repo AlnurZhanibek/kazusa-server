@@ -15,7 +15,7 @@ const (
 
 type ModuleRepositoryImplementation interface {
 	Create(module entity.NewModule) (bool, error)
-	Read(filters entity.ModuleFilters) ([]entity.Module, error)
+	Read(filters entity.ModuleFilters, pagination entity.Pagination) ([]entity.Module, error)
 }
 
 type ModuleRepository struct {
@@ -39,15 +39,22 @@ func (r *ModuleRepository) Create(module entity.NewModule) (bool, error) {
 	return true, nil
 }
 
-func (r *ModuleRepository) Read(filters entity.ModuleFilters) ([]entity.Module, error) {
+func (r *ModuleRepository) Read(filters entity.ModuleFilters, pagination entity.Pagination) ([]entity.Module, error) {
 	modules := make([]entity.Module, 0, 1)
 
 	if filters.ID == uuid.Nil && filters.CourseID == uuid.Nil {
-		return nil, fmt.Errorf("module repo error: at least one filter has to be passed")
+		if pagination.Limit == 0 {
+			return nil, fmt.Errorf("module repo error: at least one filter has to be passed")
+		}
 	}
 
-	statement := selectStatement + " where "
-	args := make([]any, 0, 2)
+	statement := selectStatement
+
+	if filters.ID != uuid.Nil || filters.CourseID != uuid.Nil {
+		statement += " where "
+	}
+
+	args := make([]any, 0, 4)
 
 	if filters.ID != uuid.Nil {
 		statement += "id = uuid_to_bin(?), "
@@ -60,6 +67,22 @@ func (r *ModuleRepository) Read(filters entity.ModuleFilters) ([]entity.Module, 
 	}
 
 	statement = strings.TrimSuffix(statement, ", ")
+
+	if pagination.Limit == 0 && filters.ID != uuid.Nil {
+		pagination.Limit = 1
+	}
+
+	if filters.CourseID != uuid.Nil {
+		pagination.Limit = 20
+	}
+
+	statement += " limit ? offset ?"
+
+	args = append(args, pagination.Limit)
+	args = append(args, pagination.Offset)
+
+	fmt.Println("statement: ", statement)
+	fmt.Println("args: ", args)
 
 	rows, err := r.db.Query(statement, args...)
 	if err != nil {

@@ -68,8 +68,8 @@ func (h *CourseHandler) Create(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			offset		query		int64	true "offset"
-//	@Param			offset		query		int64	true "limit"
-//	@Param			offset		query		string	false "id"
+//	@Param			limit		query		int64	true "limit"
+//	@Param			id			query		string	false "id"
 //	@Success		200			{array}	entity.Course
 //	@Failure		404			{boolean} boolean ok
 //	@Router			/course [get]

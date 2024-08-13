@@ -46,14 +46,14 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "limit",
-                        "name": "offset",
+                        "name": "limit",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "id",
-                        "name": "offset",
+                        "name": "id",
                         "in": "query"
                     }
                 ],
@@ -92,7 +92,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/kazusa-server_internal_entity.NewModule"
+                            "$ref": "#/definitions/NewModule"
                         }
                     }
                 ],
@@ -163,13 +163,28 @@ const docTemplate = `{
                 "operationId": "module.read",
                 "parameters": [
                     {
-                        "description": "module read request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/kazusa-server_internal_entity.ModuleReadRequest"
-                        }
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "course_id",
+                        "name": "course_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -178,7 +193,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/kazusa-server_internal_entity.Module"
+                                "$ref": "#/definitions/Module"
                             }
                         }
                     },
@@ -250,10 +265,50 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "modules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Module"
+                    }
+                },
                 "price": {
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "Module": {
+            "type": "object",
+            "required": [
+                "content",
+                "courseId",
+                "createdAt",
+                "durationMinutes",
+                "id",
+                "name"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "courseId": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "durationMinutes": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -276,6 +331,29 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "NewModule": {
+            "type": "object",
+            "required": [
+                "content",
+                "courseId",
+                "durationMinutes",
+                "name"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "courseId": {
+                    "type": "string"
+                },
+                "durationMinutes": {
+                    "type": "integer"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -330,82 +408,6 @@ const docTemplate = `{
                 },
                 "ok": {
                     "type": "boolean"
-                }
-            }
-        },
-        "kazusa-server_internal_entity.Module": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "courseId": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "durationMinutes": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "kazusa-server_internal_entity.ModuleFilters": {
-            "type": "object",
-            "properties": {
-                "courseId": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "kazusa-server_internal_entity.ModuleReadRequest": {
-            "type": "object",
-            "properties": {
-                "filters": {
-                    "$ref": "#/definitions/kazusa-server_internal_entity.ModuleFilters"
-                },
-                "pagination": {
-                    "$ref": "#/definitions/kazusa-server_internal_entity.Pagination"
-                }
-            }
-        },
-        "kazusa-server_internal_entity.NewModule": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "courseId": {
-                    "type": "string"
-                },
-                "durationMinutes": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "kazusa-server_internal_entity.Pagination": {
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer"
-                },
-                "offset": {
-                    "type": "integer"
                 }
             }
         }

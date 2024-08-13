@@ -8,7 +8,7 @@ import (
 
 type ModuleServiceImplementation interface {
 	Create(Module entity.NewModule) (bool, error)
-	Read(filters entity.ModuleFilters) ([]entity.Module, error)
+	Read(filters entity.ModuleFilters, pagination entity.Pagination) ([]entity.Module, error)
 }
 
 type ModuleService struct {
@@ -28,8 +28,8 @@ func (s *ModuleService) Create(Module entity.NewModule) (bool, error) {
 	return ok, nil
 }
 
-func (s *ModuleService) Read(filters entity.ModuleFilters) ([]entity.Module, error) {
-	modules, err := s.repo.Read(filters)
+func (s *ModuleService) Read(filters entity.ModuleFilters, pagination entity.Pagination) ([]entity.Module, error) {
+	modules, err := s.repo.Read(filters, pagination)
 	if err != nil {
 		return nil, fmt.Errorf("module service create error: %v", err)
 	}

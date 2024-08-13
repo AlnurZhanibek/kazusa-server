@@ -12,6 +12,7 @@ type Course struct {
 	Title       string    `db:"title" json:"title" validate:"required"`
 	Description string    `db:"description" json:"description" validate:"required"`
 	Price       int64     `db:"price" json:"price" validate:"required"`
+	Modules     *[]Module `db:"modules" json:"modules"`
 } // @name Course
 
 type NewCourse struct {

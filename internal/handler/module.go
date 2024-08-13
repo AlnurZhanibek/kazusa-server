@@ -2,10 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 	"kazusa-server/internal/entity"
 	"kazusa-server/internal/service"
 	"net/http"
+	"strconv"
 )
 
 type ModuleHandlerImplementation interface {
@@ -66,20 +68,48 @@ func (h *ModuleHandler) Create(w http.ResponseWriter, r *http.Request) {
 //	@ID				module.read
 //	@Accept			json
 //	@Produce		json
-//	@Param			request		body		entity.ModuleReadRequest	true "module read request"
-//	@Success		200			{array}	entity.Module
-//	@Failure		404			{boolean} boolean ok
+//	@Param			id			query		string		false 	"id"
+//	@Param			course_id	query		string		false 	"course_id"
+//	@Param			offset		query		int64		false 	"offset"
+//	@Param			limit		query		int64		false 	"limit"
+//	@Success		200			{array}		entity.Module
+//	@Failure		404			{boolean} 	boolean ok
 //	@Router			/module [get]
 func (h *ModuleHandler) Read(w http.ResponseWriter, r *http.Request) {
-	filters := entity.ModuleFilters{}
+	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
+	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
 
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&filters)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	id := r.URL.Query().Get("id")
+	courseID := r.URL.Query().Get("course_id")
+	fmt.Println(id)
+
+	filters := entity.ModuleFilters{
+		ID:       uuid.Nil,
+		CourseID: uuid.Nil,
 	}
 
-	modules, err := h.service.Read(filters)
+	pagination := entity.Pagination{
+		Offset: 0,
+		Limit:  0,
+	}
+
+	if offset != 0 {
+		pagination.Offset = offset
+	}
+
+	if limit != 0 {
+		pagination.Limit = limit
+	}
+
+	if id != "" {
+		filters.ID = uuid.MustParse(id)
+	}
+
+	if courseID != "" {
+		filters.CourseID = uuid.MustParse(courseID)
+	}
+
+	modules, err := h.service.Read(filters, pagination)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -27,13 +27,13 @@ func main() {
 	db := database.New()
 	defer db.Close()
 
-	courseRepo := repository.NewCourseRepo(db)
-	courseService := service.NewCourseService(courseRepo)
-	courseHandler := handler.NewCourseHandler(courseService)
-
 	moduleRepo := repository.NewModuleRepo(db)
 	moduleService := service.NewModuleService(moduleRepo)
 	moduleHandler := handler.NewModuleHandler(moduleService)
+
+	courseRepo := repository.NewCourseRepo(db)
+	courseService := service.NewCourseService(courseRepo, moduleRepo)
+	courseHandler := handler.NewCourseHandler(courseService)
 
 	userRepo := repository.NewUserRepo(db)
 	authService := service.NewAuthService(userRepo)
