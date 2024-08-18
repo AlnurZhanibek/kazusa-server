@@ -25,8 +25,6 @@ import (
 // @host kazusa.kz
 // @BasePath /
 func main() {
-	fmt.Println("asshole")
-
 	db := database.New()
 	defer db.Close()
 
@@ -47,4 +45,6 @@ func main() {
 		ModuleHandler: moduleHandler,
 		AuthHandler:   authHandler,
 	})
+
+	fmt.Println("asshole 2")
 }
