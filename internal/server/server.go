@@ -17,7 +17,7 @@ type Handlers struct {
 }
 
 func Start(handlers *Handlers) {
-	port := os.Getenv("HTTP_PORT")
+	port := os.Getenv("PORT")
 
 	mux := http.NewServeMux()
 
