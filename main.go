@@ -40,11 +40,11 @@ func main() {
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
+	fmt.Println("asshole 3")
+
 	server.Start(&server.Handlers{
 		CourseHandler: courseHandler,
 		ModuleHandler: moduleHandler,
 		AuthHandler:   authHandler,
 	})
-
-	fmt.Println("asshole 2")
 }
