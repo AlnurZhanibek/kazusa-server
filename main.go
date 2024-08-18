@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	_ "github.com/AlnurZhanibek/kazusa-server/docs"
 	"github.com/AlnurZhanibek/kazusa-server/internal/database"
 	"github.com/AlnurZhanibek/kazusa-server/internal/handler"
@@ -24,6 +25,8 @@ import (
 // @host kazusa.kz
 // @BasePath /
 func main() {
+	fmt.Println("asshole")
+
 	db := database.New()
 	defer db.Close()
 
