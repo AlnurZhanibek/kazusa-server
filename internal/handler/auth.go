@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"kazusa-server/internal/service"
+	"github.com/AlnurZhanibek/kazusa-server/internal/service"
 	"net/http"
 	"time"
 )

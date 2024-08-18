@@ -2,9 +2,9 @@ package server
 
 import (
 	"fmt"
+	"github.com/AlnurZhanibek/kazusa-server/internal/handler"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"kazusa-server/internal/handler"
 	"log"
 	"net/http"
 	"os"

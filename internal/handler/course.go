@@ -2,9 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
+	"github.com/AlnurZhanibek/kazusa-server/internal/service"
 	"github.com/google/uuid"
-	"kazusa-server/internal/entity"
-	"kazusa-server/internal/service"
 	"net/http"
 	"strconv"
 )

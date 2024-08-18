@@ -3,8 +3,8 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
 	"github.com/google/uuid"
-	"kazusa-server/internal/entity"
 	"strings"
 )
 

@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
+	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
+	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
 	"github.com/google/uuid"
-	"kazusa-server/internal/entity"
-	"kazusa-server/internal/repository"
 )
 
 type CourseServiceImplementation interface {

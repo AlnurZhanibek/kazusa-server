@@ -2,8 +2,8 @@ package service
 
 import (
 	"fmt"
-	"kazusa-server/internal/entity"
-	"kazusa-server/internal/repository"
+	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
+	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
 )
 
 type ModuleServiceImplementation interface {

@@ -1,12 +1,12 @@
 package main
 
 import (
-	_ "kazusa-server/docs"
-	"kazusa-server/internal/database"
-	"kazusa-server/internal/handler"
-	"kazusa-server/internal/repository"
-	"kazusa-server/internal/server"
-	"kazusa-server/internal/service"
+	_ "github.com/AlnurZhanibek/kazusa-server/docs"
+	"github.com/AlnurZhanibek/kazusa-server/internal/database"
+	"github.com/AlnurZhanibek/kazusa-server/internal/handler"
+	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
+	"github.com/AlnurZhanibek/kazusa-server/internal/server"
+	"github.com/AlnurZhanibek/kazusa-server/internal/service"
 )
 
 // @title Swagger KazUSA API
