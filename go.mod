@@ -1,4 +1,4 @@
-module kazusa-server
+module github.com/AlnurZhanibek/kazusa-server
 
 go 1.22
 
