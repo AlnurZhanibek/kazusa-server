@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"log"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
@@ -20,12 +19,12 @@ func New() *sql.DB {
 
 	db, err := sql.Open("mysql", dbConfig.FormatDSN())
 	if err != nil {
-		log.Fatalf("database connection error: %v", err)
+		panic(err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatalf("database ping error: %v", err)
+		panic(err)
 	}
 
 	return db
