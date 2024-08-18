@@ -66,5 +66,7 @@ func Start(handlers *Handlers) {
 	err := http.ListenAndServe(fmt.Sprintf(":%v", port), muxHandler)
 	if err != nil {
 		log.Fatalf("server error: %v", err)
+	} else {
+		log.Printf("server running on port: %v\n", port)
 	}
 }
