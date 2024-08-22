@@ -10,7 +10,7 @@ import (
 
 const (
 	userInsertStatement = "insert into users(id, email, name, phone, password, role) values(uuid_to_bin(?), ?, ?, ?, ?, ?)"
-	userSelectStatement = "select id, email, name, phone, password, role from users;"
+	userSelectStatement = "select id, email, name, phone, password, role from users"
 	userUpdateStatement = "update users set "
 	userDeleteStatement = "delete from users where id = uuid_to_bin(?);"
 )
@@ -64,7 +64,7 @@ func (r *UserRepository) Read(pagination entity.Pagination, filters entity.UserF
 
 	rows, err := r.db.Query(statement, args...)
 	if err != nil {
-		return nil, fmt.Errorf("user repo error on reading courses: %v", err)
+		return nil, fmt.Errorf("user repo error on reading users: %v", err)
 	}
 	defer rows.Close()
 

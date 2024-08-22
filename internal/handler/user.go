@@ -79,19 +79,26 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 //	@Failure		404			{boolean} boolean ok
 //	@Router			/user [get]
 func (h *UserHandler) Read(w http.ResponseWriter, r *http.Request) {
-	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	offset, _ := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
+	limit, _ := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
+
+	pagination := entity.Pagination{
+		Offset: 0,
+		Limit:  0,
 	}
-	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+
+	if offset != 0 {
+		pagination.Offset = offset
+	}
+
+	if limit != 0 {
+		pagination.Limit = limit
 	}
 
 	id := r.URL.Query().Get("id")
 
 	filters := entity.UserFilters{
-		ID: &uuid.Nil,
+		ID: nil,
 	}
 
 	if id != "" {

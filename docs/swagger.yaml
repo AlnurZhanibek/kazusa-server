@@ -62,6 +62,19 @@ definitions:
     - id
     - name
     type: object
+  ModuleUpdateBody:
+    properties:
+      content:
+        type: string
+      durationMinutes:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+    required:
+    - id
+    type: object
   NewCourse:
     properties:
       description:
@@ -151,19 +164,6 @@ definitions:
         $ref: '#/definitions/entity.Role'
     required:
     - id
-    type: object
-  entity.ModuleUpdateBody:
-    properties:
-      content:
-        type: string
-      courseId:
-        type: string
-      durationMinutes:
-        type: integer
-      name:
-        type: string
-    required:
-    - courseId
     type: object
   entity.Role:
     enum:
@@ -423,7 +423,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.ModuleUpdateBody'
+          $ref: '#/definitions/ModuleUpdateBody'
       produces:
       - application/json
       responses:

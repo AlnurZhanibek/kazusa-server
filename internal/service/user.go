@@ -32,12 +32,12 @@ func (s *UserService) Create(user entity.NewUser) (bool, error) {
 }
 
 func (s *UserService) Read(pagination entity.Pagination, filters entity.UserFilters) ([]entity.User, error) {
-	modules, err := s.repo.Read(pagination, filters)
+	users, err := s.repo.Read(pagination, filters)
 	if err != nil {
 		return nil, fmt.Errorf("user service create error: %v", err)
 	}
 
-	return modules, nil
+	return users, nil
 }
 
 func (s *UserService) Update(body entity.UserUpdateBody) (bool, error) {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
 	"github.com/AlnurZhanibek/kazusa-server/internal/service"
 	"github.com/google/uuid"
@@ -81,12 +80,11 @@ func (h *ModuleHandler) Create(w http.ResponseWriter, r *http.Request) {
 //	@Failure		404			{boolean} 	boolean ok
 //	@Router			/module [get]
 func (h *ModuleHandler) Read(w http.ResponseWriter, r *http.Request) {
-	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
-	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
+	offset, _ := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
+	limit, _ := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
 
 	id := r.URL.Query().Get("id")
 	courseID := r.URL.Query().Get("course_id")
-	fmt.Println(id)
 
 	filters := entity.ModuleFilters{
 		ID:       uuid.Nil,

@@ -292,7 +292,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.ModuleUpdateBody"
+                            "$ref": "#/definitions/ModuleUpdateBody"
                         }
                     }
                 ],
@@ -634,6 +634,26 @@ const docTemplate = `{
                 }
             }
         },
+        "ModuleUpdateBody": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "durationMinutes": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "NewCourse": {
             "type": "object",
             "required": [
@@ -762,26 +782,6 @@ const docTemplate = `{
                 },
                 "role": {
                     "$ref": "#/definitions/entity.Role"
-                }
-            }
-        },
-        "entity.ModuleUpdateBody": {
-            "type": "object",
-            "required": [
-                "courseId"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "courseId": {
-                    "type": "string"
-                },
-                "durationMinutes": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },
