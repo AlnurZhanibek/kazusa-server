@@ -78,16 +78,8 @@ func (h *CourseHandler) Create(w http.ResponseWriter, r *http.Request) {
 //	@Failure		404			{boolean} boolean ok
 //	@Router			/course [get]
 func (h *CourseHandler) Read(w http.ResponseWriter, r *http.Request) {
-	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
-		return
-	}
-	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
-		return
-	}
+	offset, _ := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
+	limit, _ := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
 
 	id := r.URL.Query().Get("id")
 

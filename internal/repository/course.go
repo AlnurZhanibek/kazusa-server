@@ -53,7 +53,10 @@ func (r *CourseRepository) Read(pagination entity.Pagination, filters entity.Cou
 		statement += " where "
 		statement += "id = uuid_to_bin(?), "
 		args = append(args, filters.ID)
+	}
 
+	if pagination.Limit == 0 {
+		pagination.Limit = 1
 	}
 
 	statement = strings.TrimSuffix(statement, ", ")
