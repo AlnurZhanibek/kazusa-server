@@ -21,6 +21,13 @@ type NewCourse struct {
 	Price       int64  `db:"price" json:"price" validate:"required"`
 } // @name NewCourse
 
+type CourseUpdateBody struct {
+	ID          uuid.UUID `db:"id" json:"id" validate:"required"`
+	Title       *string   `db:"title" json:"title"`
+	Description *string   `db:"description" json:"description"`
+	Price       *int64    `db:"price" json:"price"`
+} // @name CourseUpdateBody
+
 type CourseFilters struct {
 	ID uuid.UUID `db:"id" json:"id" validate:"required"`
 } // @name CourseFilters

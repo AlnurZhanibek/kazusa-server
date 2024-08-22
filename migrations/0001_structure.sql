@@ -16,7 +16,7 @@ create table if not exists modules (
     created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp on update current_timestamp,
     name varchar(256) not null,
-    content varchar(8192) not null,
+    content longtext not null,
     duration_minutes integer not null,
     foreign key (course_id) references courses (id)
 );

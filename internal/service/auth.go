@@ -12,6 +12,12 @@ import (
 
 var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
+type Claims struct {
+	jwt.StandardClaims
+	Name string      `json:"name"`
+	Role entity.Role `json:"role"`
+}
+
 type AuthService struct {
 	userRepo *repository.UserRepository
 }
@@ -26,8 +32,8 @@ func (s *AuthService) Login(email string, password string) (string, error) {
 			Offset: 0,
 			Limit:  1,
 		},
-		repository.UserFilters{
-			Email: email,
+		entity.UserFilters{
+			Email: &email,
 		},
 	)
 	if err != nil {
@@ -38,15 +44,20 @@ func (s *AuthService) Login(email string, password string) (string, error) {
 	}
 	user := users[0]
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(*user.Password), []byte(password))
 	if err != nil {
 		return "", fmt.Errorf("auth service login error comparing pass: %v", err)
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-		Subject:   email,
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			Subject:   email,
+		},
+		Name: user.Name,
+		Role: user.Role,
 	})
+
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		return "", fmt.Errorf("auth service login error generating token: %v", err)
@@ -69,8 +80,8 @@ func (s *AuthService) Register(name string, email string, phone string, password
 			Offset: 0,
 			Limit:  1,
 		},
-		repository.UserFilters{
-			Email: email,
+		entity.UserFilters{
+			Email: &email,
 		},
 	)
 	if err != nil {
@@ -80,17 +91,18 @@ func (s *AuthService) Register(name string, email string, phone string, password
 		return "", fmt.Errorf("auth service register error: user already exists")
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
 		return "", fmt.Errorf("auth service register password hash error: %v", err)
 	}
 
-	newUser := repository.User{
+	hashedPassword := string(hashedPasswordBytes)
+
+	newUser := entity.NewUser{
 		Name:     name,
 		Email:    email,
 		Phone:    phone,
-		Password: string(hashedPassword),
-		Role:     "user",
+		Password: hashedPassword,
 	}
 
 	_, err = s.userRepo.Create(newUser)
@@ -98,10 +110,15 @@ func (s *AuthService) Register(name string, email string, phone string, password
 		return "", fmt.Errorf("auth service register error: %v", err)
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-		Subject:   email,
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			Subject:   email,
+		},
+		Name: name,
+		Role: "user",
 	})
+
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		return "", fmt.Errorf("auth service register error generating token: %v", err)

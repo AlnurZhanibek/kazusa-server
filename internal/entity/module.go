@@ -22,6 +22,13 @@ type NewModule struct {
 	DurationMinutes int64     `db:"duration_minutes" json:"durationMinutes" validate:"required"`
 } // @name NewModule
 
+type ModuleUpdateBody struct {
+	ID              uuid.UUID `db:"course_id" json:"courseId" validate:"required"`
+	Name            *string   `db:"name" json:"name"`
+	Content         *string   `db:"content" json:"content"`
+	DurationMinutes *int64    `db:"duration_minutes" json:"durationMinutes"`
+}
+
 type ModuleFilters struct {
 	ID       uuid.UUID `db:"id" json:"id"`
 	CourseID uuid.UUID `db:"course_id" json:"courseId"`

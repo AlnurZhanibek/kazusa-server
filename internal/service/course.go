@@ -10,6 +10,8 @@ import (
 type CourseServiceImplementation interface {
 	Create(course entity.NewCourse) (bool, error)
 	Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error)
+	Update(body entity.CourseUpdateBody) (bool, error)
+	Delete(id uuid.UUID) (bool, error)
 }
 
 type CourseService struct {
@@ -49,4 +51,22 @@ func (s *CourseService) Read(pagination entity.Pagination, filters entity.Course
 	}
 
 	return courses, nil
+}
+
+func (s *CourseService) Update(course entity.CourseUpdateBody) (bool, error) {
+	ok, err := s.repo.Update(course)
+	if err != nil {
+		return false, fmt.Errorf("course service update error: %v", err)
+	}
+
+	return ok, nil
+}
+
+func (s *CourseService) Delete(id uuid.UUID) (bool, error) {
+	ok, err := s.repo.Delete(id)
+	if err != nil {
+		return false, fmt.Errorf("course service delete error: %v", err)
+	}
+
+	return ok, nil
 }

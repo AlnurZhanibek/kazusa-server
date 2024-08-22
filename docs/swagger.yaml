@@ -25,6 +25,19 @@ definitions:
     - price
     - title
     type: object
+  CourseUpdateBody:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      price:
+        type: integer
+      title:
+        type: string
+    required:
+    - id
+    type: object
   Module:
     properties:
       content:
@@ -78,21 +91,103 @@ definitions:
     - durationMinutes
     - name
     type: object
-  internal_handler.LoginRequest:
+  NewUser:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        $ref: '#/definitions/entity.Role'
+    required:
+    - email
+    - name
+    - password
+    - phone
+    - role
+    type: object
+  User:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        $ref: '#/definitions/entity.Role'
+      updatedAt:
+        type: string
+    required:
+    - createdAt
+    - email
+    - id
+    - name
+    - phone
+    type: object
+  UserUpdateBody:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        $ref: '#/definitions/entity.Role'
+    required:
+    - id
+    type: object
+  entity.ModuleUpdateBody:
+    properties:
+      content:
+        type: string
+      courseId:
+        type: string
+      durationMinutes:
+        type: integer
+      name:
+        type: string
+    required:
+    - courseId
+    type: object
+  entity.Role:
+    enum:
+    - admin
+    - user
+    type: string
+    x-enum-varnames:
+    - AdminRole
+    - UserRole
+  handler.LoginRequest:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  internal_handler.LoginResponse:
+  handler.LoginResponse:
     properties:
       error:
         type: string
-      ok:
-        type: boolean
+      token:
+        type: string
     type: object
-  internal_handler.RegisterRequest:
+  handler.RegisterRequest:
     properties:
       email:
         type: string
@@ -105,12 +200,12 @@ definitions:
       phone:
         type: string
     type: object
-  internal_handler.RegisterResponse:
+  handler.RegisterResponse:
     properties:
       error:
         type: string
-      ok:
-        type: boolean
+      token:
+        type: string
     type: object
 host: kazusa.kz
 info:
@@ -127,6 +222,29 @@ info:
   version: "1.0"
 paths:
   /course:
+    delete:
+      consumes:
+      - application/json
+      description: delete course
+      operationId: course.delete
+      parameters:
+      - description: course id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Delete course
     get:
       consumes:
       - application/json
@@ -164,15 +282,15 @@ paths:
     post:
       consumes:
       - application/json
-      description: create module
-      operationId: module.create
+      description: create course
+      operationId: course.create
       parameters:
-      - description: new module body
+      - description: new course body
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/NewModule'
+          $ref: '#/definitions/NewCourse'
       produces:
       - application/json
       responses:
@@ -184,7 +302,31 @@ paths:
           description: Bad Request
           schema:
             type: boolean
-      summary: Create module
+      summary: Create course
+    put:
+      consumes:
+      - application/json
+      description: update course
+      operationId: course.update
+      parameters:
+      - description: update course body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/CourseUpdateBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Update course
   /login:
     post:
       consumes:
@@ -197,20 +339,43 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handler.LoginRequest'
+          $ref: '#/definitions/handler.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handler.LoginResponse'
+            $ref: '#/definitions/handler.LoginResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handler.LoginResponse'
+            $ref: '#/definitions/handler.LoginResponse'
       summary: Login a user
   /module:
+    delete:
+      consumes:
+      - application/json
+      description: delete module
+      operationId: module.delete
+      parameters:
+      - description: module id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Delete module
     get:
       consumes:
       - application/json
@@ -247,6 +412,30 @@ paths:
           schema:
             type: boolean
       summary: Read modules
+    post:
+      consumes:
+      - application/json
+      description: update module
+      operationId: module.update
+      parameters:
+      - description: update module body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.ModuleUpdateBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Update module
   /register:
     post:
       consumes:
@@ -259,17 +448,123 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handler.RegisterRequest'
+          $ref: '#/definitions/handler.RegisterRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_handler.RegisterResponse'
+            $ref: '#/definitions/handler.RegisterResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/internal_handler.RegisterResponse'
+            $ref: '#/definitions/handler.RegisterResponse'
       summary: Register a user
+  /user:
+    delete:
+      consumes:
+      - application/json
+      description: delete user
+      operationId: user.delete
+      parameters:
+      - description: user id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Delete user
+    get:
+      consumes:
+      - application/json
+      description: read users
+      operationId: user.read
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/User'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            type: boolean
+      summary: Read users
+    post:
+      consumes:
+      - application/json
+      description: create user
+      operationId: user.create
+      parameters:
+      - description: new user body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/NewUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Create user
+    put:
+      consumes:
+      - application/json
+      description: update user
+      operationId: user.update
+      parameters:
+      - description: update user body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/UserUpdateBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Update user
 swagger: "2.0"

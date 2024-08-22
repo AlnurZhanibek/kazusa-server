@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	_ "github.com/AlnurZhanibek/kazusa-server/docs"
 	"github.com/AlnurZhanibek/kazusa-server/internal/database"
 	"github.com/AlnurZhanibek/kazusa-server/internal/handler"
@@ -37,14 +36,16 @@ func main() {
 	courseHandler := handler.NewCourseHandler(courseService)
 
 	userRepo := repository.NewUserRepo(db)
+	userService := service.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userService)
+
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
-
-	fmt.Println("asshole 3")
 
 	server.Start(&server.Handlers{
 		CourseHandler: courseHandler,
 		ModuleHandler: moduleHandler,
+		UserHandler:   userHandler,
 		AuthHandler:   authHandler,
 	})
 }

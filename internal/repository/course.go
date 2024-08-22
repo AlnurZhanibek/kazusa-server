@@ -11,11 +11,15 @@ import (
 const (
 	courseInsertStatement = "insert into courses(id, title, description, price) values(uuid_to_bin(?), ?, ?, ?)"
 	courseSelectStatement = "select id, created_at, updated_at, title, description, price from courses"
+	courseUpdateStatement = "update courses set "
+	courseDeleteStatement = "delete from courses where id = uuid_to_bin(?)"
 )
 
 type CourseRepositoryImplementation interface {
 	Create(course entity.NewCourse) (bool, error)
 	Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error)
+	Update(body entity.CourseUpdateBody) (bool, error)
+	Delete(id uuid.UUID) (bool, error)
 }
 
 type CourseRepository struct {
@@ -82,4 +86,57 @@ func (r *CourseRepository) Read(pagination entity.Pagination, filters entity.Cou
 	}
 
 	return courses, nil
+}
+
+func (r *CourseRepository) Update(body entity.CourseUpdateBody) (bool, error) {
+	statement := courseUpdateStatement
+	args := make([]any, 0, 4)
+
+	if body.ID == uuid.Nil {
+		return false, fmt.Errorf("course repo error: id is empty")
+	}
+
+	if body.Title != nil {
+		statement += "title = ?, "
+		args = append(args, body.Title)
+	}
+
+	if body.Description != nil {
+		statement += "description = ?, "
+		args = append(args, body.Description)
+	}
+
+	if body.Price != nil {
+		statement += "price = ?, "
+		args = append(args, body.Price)
+	}
+
+	if len(args) == 0 {
+		return false, fmt.Errorf("course repo error when updating course: update body is empty")
+	}
+
+	statement = strings.TrimSuffix(statement, ", ")
+	args = append(args, body.ID)
+
+	statement += " where id = uuid_to_bin(?);"
+
+	_, err := r.db.Exec(statement, args...)
+	if err != nil {
+		return false, fmt.Errorf("course repo error when updating course: %v", err)
+	}
+
+	return true, nil
+}
+
+func (r *CourseRepository) Delete(id uuid.UUID) (bool, error) {
+	if id == uuid.Nil {
+		return false, fmt.Errorf("course repo error when deleting course: id is empty")
+	}
+
+	_, err := r.db.Exec(courseDeleteStatement, id)
+	if err != nil {
+		return false, fmt.Errorf("course repo error when deleting course: %v", err)
+	}
+
+	return true, nil
 }

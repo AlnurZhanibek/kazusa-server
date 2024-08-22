@@ -23,7 +23,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	OK    bool   `json:"ok"`
+	Token string `json:"token"`
 	Error string `json:"error,omitempty"`
 }
 
@@ -47,8 +47,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		encoder.Encode(LoginResponse{
-			OK:    false,
-			Error: "",
+			Token: "",
+			Error: err.Error(),
 		})
 	}
 
@@ -57,7 +57,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		encoder.Encode(LoginResponse{
-			OK:    false,
+			Token: "",
 			Error: "service error",
 		})
 	}
@@ -71,7 +71,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 
 	encoder.Encode(LoginResponse{
-		OK:    true,
+		Token: token,
 		Error: "",
 	})
 }
@@ -85,7 +85,7 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	OK    bool   `json:"ok"`
+	Token string `json:"token"`
 	Error string `json:"error,omitempty"`
 }
 
@@ -111,7 +111,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		encoder.Encode(RegisterResponse{
-			OK:    false,
+			Token: "",
 			Error: "decode error",
 		})
 	}
@@ -121,7 +121,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		encoder.Encode(RegisterResponse{
-			OK:    false,
+			Token: "",
 			Error: "token gen error",
 		})
 	}
@@ -135,7 +135,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	})
 
 	encoder.Encode(RegisterResponse{
-		OK:    true,
+		Token: token,
 		Error: "",
 	})
 }

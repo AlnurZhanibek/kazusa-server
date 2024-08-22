@@ -10,7 +10,9 @@ import (
 
 const (
 	userInsertStatement = "insert into users(id, email, name, phone, password, role) values(uuid_to_bin(?), ?, ?, ?, ?, ?)"
-	userSelectStatement = "select id, email, name, phone, password, role from users"
+	userSelectStatement = "select id, email, name, phone, password, role from users;"
+	userUpdateStatement = "update users set "
+	userDeleteStatement = "delete from users where id = uuid_to_bin(?);"
 )
 
 type UserRepository struct {
@@ -23,16 +25,7 @@ func NewUserRepo(db *sql.DB) *UserRepository {
 	}
 }
 
-type User struct {
-	ID       uuid.UUID
-	Name     string
-	Email    string
-	Phone    string
-	Password string
-	Role     string
-}
-
-func (r *UserRepository) Create(user User) (bool, error) {
+func (r *UserRepository) Create(user entity.NewUser) (bool, error) {
 	newID := uuid.New()
 
 	_, err := r.db.Exec(userInsertStatement, newID, user.Email, user.Name, user.Phone, user.Password, user.Role)
@@ -43,29 +36,24 @@ func (r *UserRepository) Create(user User) (bool, error) {
 	return true, nil
 }
 
-type UserFilters struct {
-	ID    uuid.UUID
-	Email string
-}
-
-func (r *UserRepository) Read(pagination entity.Pagination, filters UserFilters) ([]User, error) {
-	users := make([]User, 0, pagination.Limit)
+func (r *UserRepository) Read(pagination entity.Pagination, filters entity.UserFilters) ([]entity.User, error) {
+	users := make([]entity.User, 0, pagination.Limit)
 
 	statement := userSelectStatement
 	args := make([]any, 0, 4)
 
-	if filters.ID != uuid.Nil || filters.Email != "" {
+	if filters.ID != nil || filters.Email != nil {
 		statement = statement + " where "
 	}
 
-	if filters.ID != uuid.Nil {
+	if filters.ID != nil {
 		statement += "id = uuid_to_bin(?), "
-		args = append(args, filters.ID)
+		args = append(args, *filters.ID)
 	}
 
-	if filters.Email != "" {
+	if filters.Email != nil {
 		statement += "email = ?, "
-		args = append(args, filters.Email)
+		args = append(args, *filters.Email)
 	}
 
 	statement = strings.TrimSuffix(statement, ", ")
@@ -81,7 +69,7 @@ func (r *UserRepository) Read(pagination entity.Pagination, filters UserFilters)
 	defer rows.Close()
 
 	for rows.Next() {
-		user := User{}
+		user := entity.User{}
 
 		err = rows.Scan(&user.ID, &user.Email, &user.Name, &user.Phone, &user.Password, &user.Role)
 		if err != nil {
@@ -97,4 +85,67 @@ func (r *UserRepository) Read(pagination entity.Pagination, filters UserFilters)
 	}
 
 	return users, nil
+}
+
+func (r *UserRepository) Update(body entity.UserUpdateBody) (bool, error) {
+	statement := userUpdateStatement
+	args := make([]any, 0, 6)
+
+	if body.ID == uuid.Nil {
+		return false, fmt.Errorf("ID is empty, repo layer error")
+	}
+
+	if body.Name != nil {
+		statement += "name = ?, "
+		args = append(args, body.Name)
+	}
+
+	if body.Email != nil {
+		statement += "email = ?, "
+		args = append(args, body.Email)
+	}
+
+	if body.Phone != nil {
+		statement += "phone = ?, "
+		args = append(args, body.Phone)
+	}
+
+	if body.Password != nil {
+		statement += "password = ?, "
+		args = append(args, body.Password)
+	}
+
+	if body.Role != nil {
+		statement += "role = ?, "
+		args = append(args, body.Role)
+	}
+
+	if len(args) == 0 {
+		return false, fmt.Errorf("user repo error: update body is empty")
+	}
+
+	statement = strings.TrimSuffix(statement, ", ")
+	args = append(args, body.ID)
+
+	statement += " where id = uuid_to_bin(?);"
+
+	_, err := r.db.Exec(statement, args...)
+	if err != nil {
+		return false, fmt.Errorf("user repo error when updating user: %v", err)
+	}
+
+	return true, nil
+}
+
+func (r *UserRepository) Delete(id uuid.UUID) (bool, error) {
+	if id == uuid.Nil {
+		return false, fmt.Errorf("user repo error when deleting user: id is empty")
+	}
+
+	_, err := r.db.Exec(userDeleteStatement, id)
+	if err != nil {
+		return false, fmt.Errorf("user repo error when deleting user: %v", err)
+	}
+
+	return true, nil
 }

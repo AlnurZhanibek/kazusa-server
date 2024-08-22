@@ -11,11 +11,15 @@ import (
 const (
 	insertStatement = "insert into modules(id, course_id, name, content, duration_minutes) values(uuid_to_bin(?), uuid_to_bin(?), ?, ?, ?)"
 	selectStatement = "select id, course_id, created_at, updated_at, name, content, duration_minutes from modules"
+	updateStatement = "update modules set "
+	deleteStatement = "delete from modules where id = uuid_to_bin(?)"
 )
 
 type ModuleRepositoryImplementation interface {
 	Create(module entity.NewModule) (bool, error)
 	Read(filters entity.ModuleFilters, pagination entity.Pagination) ([]entity.Module, error)
+	Update(body entity.ModuleUpdateBody) (bool, error)
+	Delete(id uuid.UUID) (bool, error)
 }
 
 type ModuleRepository struct {
@@ -44,7 +48,7 @@ func (r *ModuleRepository) Read(filters entity.ModuleFilters, pagination entity.
 
 	if filters.ID == uuid.Nil && filters.CourseID == uuid.Nil {
 		if pagination.Limit == 0 {
-			return nil, fmt.Errorf("module repo error: at least one filter has to be passed")
+			return nil, fmt.Errorf("module repo error when reading: at least one filter has to be passed")
 		}
 	}
 
@@ -107,4 +111,57 @@ func (r *ModuleRepository) Read(filters entity.ModuleFilters, pagination entity.
 	}
 
 	return modules, nil
+}
+
+func (r *ModuleRepository) Update(body entity.ModuleUpdateBody) (bool, error) {
+	statement := updateStatement
+	args := make([]any, 0, 4)
+
+	if body.ID == uuid.Nil {
+		return false, fmt.Errorf("ID is empty, repo layer error")
+	}
+
+	if body.Name != nil {
+		statement += "name = ?, "
+		args = append(args, body.Name)
+	}
+
+	if body.Content != nil {
+		statement += "content = ?, "
+		args = append(args, body.Content)
+	}
+
+	if body.DurationMinutes != nil {
+		statement += "duration_minutes = ?, "
+		args = append(args, body.DurationMinutes)
+	}
+
+	if len(args) == 0 {
+		return false, fmt.Errorf("module repo error: update body is empty")
+	}
+
+	statement = strings.TrimSuffix(statement, ", ")
+	args = append(args, body.ID)
+
+	statement += " where id = uuid_to_bin(?);"
+
+	_, err := r.db.Exec(statement, args...)
+	if err != nil {
+		return false, fmt.Errorf("module repo error when updating course: %v", err)
+	}
+
+	return true, nil
+}
+
+func (r *ModuleRepository) Delete(id uuid.UUID) (bool, error) {
+	if id == uuid.Nil {
+		return false, fmt.Errorf("module repo error when deleting course: id is empty")
+	}
+
+	_, err := r.db.Exec(deleteStatement, id)
+	if err != nil {
+		return false, fmt.Errorf("module repo error when deleting course: %v", err)
+	}
+
+	return true, nil
 }

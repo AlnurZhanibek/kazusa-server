@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
 	"github.com/AlnurZhanibek/kazusa-server/internal/service"
 	"github.com/google/uuid"
@@ -10,48 +9,48 @@ import (
 	"strconv"
 )
 
-type ModuleHandlerImplementation interface {
+type UserHandlerImplementation interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	Read(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 }
 
-type ModuleHandler struct {
-	service service.ModuleServiceImplementation
+type UserHandler struct {
+	service service.UserServiceImplementation
 }
 
-func NewModuleHandler(service service.ModuleServiceImplementation) *ModuleHandler {
-	return &ModuleHandler{service: service}
+func NewUserHandler(service service.UserServiceImplementation) *UserHandler {
+	return &UserHandler{service: service}
 }
 
-// Create module
+// Create user
 //
-//	@Summary		Create module
-//	@Description	create module
-//	@ID				module.create
+//	@Summary		Create user
+//	@Description	create user
+//	@ID				user.create
 //	@Accept			json
 //	@Produce		json
-//	@Param			request		body		entity.NewModule	true "new module body"
+//	@Param			request		body		entity.NewUser	true "new user body"
 //	@Success		200			{boolean} boolean ok
 //	@Failure		400			{boolean} boolean ok
-//	@Router			/module [post]
-func (h *ModuleHandler) Create(w http.ResponseWriter, r *http.Request) {
-	newModule := entity.NewModule{}
+//	@Router			/user [post]
+func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
+	newUser := entity.NewUser{}
 
 	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&newModule)
+	err := decoder.Decode(&newUser)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
-	if newModule.Name == "" || newModule.Content == "" || newModule.CourseID == uuid.Nil || newModule.DurationMinutes == 0 {
-		http.Error(w, "name, content, content or duration is empty!", http.StatusUnprocessableEntity)
+	if newUser.Name == "" || newUser.Email == "" {
+		http.Error(w, "name or email is empty!", http.StatusUnprocessableEntity)
 		return
 	}
 
-	ok, err := h.service.Create(newModule)
+	ok, err := h.service.Create(newUser)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -66,55 +65,45 @@ func (h *ModuleHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Read module
+// Read User
 //
-//	@Summary		Read modules
-//	@Description	read modules
-//	@ID				module.read
+//	@Summary		Read users
+//	@Description	read users
+//	@ID				user.read
 //	@Accept			json
 //	@Produce		json
-//	@Param			id			query		string		false 	"id"
-//	@Param			course_id	query		string		false 	"course_id"
-//	@Param			offset		query		int64		false 	"offset"
-//	@Param			limit		query		int64		false 	"limit"
-//	@Success		200			{array}		entity.Module
-//	@Failure		404			{boolean} 	boolean ok
-//	@Router			/module [get]
-func (h *ModuleHandler) Read(w http.ResponseWriter, r *http.Request) {
+//	@Param			offset		query		int64	true "offset"
+//	@Param			limit		query		int64	true "limit"
+//	@Param			id			query		string	false "id"
+//	@Success		200			{array}	entity.User
+//	@Failure		404			{boolean} boolean ok
+//	@Router			/user [get]
+func (h *UserHandler) Read(w http.ResponseWriter, r *http.Request) {
 	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	}
 	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	}
 
 	id := r.URL.Query().Get("id")
-	courseID := r.URL.Query().Get("course_id")
-	fmt.Println(id)
 
-	filters := entity.ModuleFilters{
-		ID:       uuid.Nil,
-		CourseID: uuid.Nil,
-	}
-
-	pagination := entity.Pagination{
-		Offset: 0,
-		Limit:  0,
-	}
-
-	if offset != 0 {
-		pagination.Offset = offset
-	}
-
-	if limit != 0 {
-		pagination.Limit = limit
+	filters := entity.UserFilters{
+		ID: &uuid.Nil,
 	}
 
 	if id != "" {
-		filters.ID = uuid.MustParse(id)
+		parsedID := uuid.MustParse(id)
+		filters.ID = &parsedID
 	}
 
-	if courseID != "" {
-		filters.CourseID = uuid.MustParse(courseID)
-	}
+	users, err := h.service.Read(entity.Pagination{
+		Offset: offset,
+		Limit:  limit,
+	}, filters)
 
-	modules, err := h.service.Read(pagination, filters)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -122,26 +111,26 @@ func (h *ModuleHandler) Read(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(w)
-	err = encoder.Encode(modules)
+	err = encoder.Encode(users)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
-// Update module
+// Update user
 //
-//	@Summary		Update module
-//	@Description	update module
-//	@ID				module.update
+//	@Summary		Update user
+//	@Description	update user
+//	@ID				user.update
 //	@Accept			json
 //	@Produce		json
-//	@Param			request		body		entity.ModuleUpdateBody	true "update module body"
+//	@Param			request		body		entity.UserUpdateBody	true "update user body"
 //	@Success		200			{boolean} boolean ok
 //	@Failure		400			{boolean} boolean ok
-//	@Router			/module [post]
-func (h *ModuleHandler) Update(w http.ResponseWriter, r *http.Request) {
-	body := entity.ModuleUpdateBody{}
+//	@Router			/user [put]
+func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
+	body := entity.UserUpdateBody{}
 
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&body)
@@ -170,28 +159,28 @@ func (h *ModuleHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Delete module
+// Delete user
 //
-//	@Summary		Delete module
-//	@Description	delete module
-//	@ID				module.delete
+//	@Summary		Delete user
+//	@Description	delete user
+//	@ID				user.delete
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		    query	  string	true "module id"
+//	@Param			id		    query	  string	true "user id"
 //	@Success		200			{boolean} boolean ok
 //	@Failure		400			{boolean} boolean ok
-//	@Router			/module [delete]
-func (h *ModuleHandler) Delete(w http.ResponseWriter, r *http.Request) {
+//	@Router			/user [delete]
+func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := uuid.UUID{}
 
 	id, err := uuid.Parse(r.URL.Query().Get("id"))
 	if err != nil {
-		http.Error(w, "module handler error: error parsing id", http.StatusUnprocessableEntity)
+		http.Error(w, "user handler error: error parsing id", http.StatusUnprocessableEntity)
 		return
 	}
 
 	if id == uuid.Nil {
-		http.Error(w, "module handler error: id is empty!", http.StatusUnprocessableEntity)
+		http.Error(w, "user handler error: id is empty!", http.StatusUnprocessableEntity)
 		return
 	}
 
