@@ -79,7 +79,7 @@ func (r *ModuleRepository) Read(filters entity.ModuleFilters, pagination entity.
 	}
 
 	if filters.CourseID != uuid.Nil {
-		pagination.Limit = 20
+		pagination.Limit = 100
 	}
 
 	statement += " limit ? offset ?"
