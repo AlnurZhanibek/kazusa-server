@@ -12,6 +12,7 @@ type Module struct {
 	UpdatedAt       time.Time `db:"updated_at" json:"updatedAt"`
 	Name            string    `db:"name" json:"name" validate:"required"`
 	Content         string    `db:"content" json:"content" validate:"required"`
+	Order           int64     `db:"order_number" json:"order" validate:"required"`
 	DurationMinutes int64     `db:"duration_minutes" json:"durationMinutes" validate:"required"`
 } // @name Module
 
@@ -19,6 +20,7 @@ type NewModule struct {
 	CourseID        uuid.UUID `db:"course_id" json:"courseId" validate:"required"`
 	Name            string    `db:"name" json:"name" validate:"required"`
 	Content         string    `db:"content" json:"content" validate:"required"`
+	Order           int64     `db:"order_number" json:"order" validate:"required"`
 	DurationMinutes int64     `db:"duration_minutes" json:"durationMinutes" validate:"required"`
 } // @name NewModule
 
@@ -26,6 +28,7 @@ type ModuleUpdateBody struct {
 	ID              uuid.UUID `db:"id" json:"id" validate:"required"`
 	Name            *string   `db:"name" json:"name"`
 	Content         *string   `db:"content" json:"content"`
+	Order           *int64    `db:"order_number" json:"order"`
 	DurationMinutes *int64    `db:"duration_minutes" json:"durationMinutes"`
 } // @name ModuleUpdateBody
 

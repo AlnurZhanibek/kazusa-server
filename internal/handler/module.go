@@ -45,8 +45,8 @@ func (h *ModuleHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if newModule.Name == "" || newModule.Content == "" || newModule.CourseID == uuid.Nil || newModule.DurationMinutes == 0 {
-		http.Error(w, "name, content, content or duration is empty!", http.StatusUnprocessableEntity)
+	if newModule.Name == "" || newModule.Content == "" || newModule.CourseID == uuid.Nil || newModule.DurationMinutes == 0 || newModule.Order == 0 {
+		http.Error(w, "name, content, content or order duration is empty!", http.StatusUnprocessableEntity)
 		return
 	}
 

@@ -52,6 +52,8 @@ definitions:
         type: string
       name:
         type: string
+      order:
+        type: integer
       updatedAt:
         type: string
     required:
@@ -61,6 +63,7 @@ definitions:
     - durationMinutes
     - id
     - name
+    - order
     type: object
   ModuleUpdateBody:
     properties:
@@ -72,6 +75,8 @@ definitions:
         type: string
       name:
         type: string
+      order:
+        type: integer
     required:
     - id
     type: object
@@ -98,11 +103,14 @@ definitions:
         type: integer
       name:
         type: string
+      order:
+        type: integer
     required:
     - content
     - courseId
     - durationMinutes
     - name
+    - order
     type: object
   NewUser:
     properties:

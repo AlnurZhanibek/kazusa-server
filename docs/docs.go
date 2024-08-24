@@ -608,7 +608,8 @@ const docTemplate = `{
                 "createdAt",
                 "durationMinutes",
                 "id",
-                "name"
+                "name",
+                "order"
             ],
             "properties": {
                 "content": {
@@ -628,6 +629,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "order": {
+                    "type": "integer"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -651,6 +655,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "order": {
+                    "type": "integer"
                 }
             }
         },
@@ -679,7 +686,8 @@ const docTemplate = `{
                 "content",
                 "courseId",
                 "durationMinutes",
-                "name"
+                "name",
+                "order"
             ],
             "properties": {
                 "content": {
@@ -693,6 +701,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "order": {
+                    "type": "integer"
                 }
             }
         },

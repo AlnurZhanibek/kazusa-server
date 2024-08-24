@@ -602,7 +602,8 @@
                 "createdAt",
                 "durationMinutes",
                 "id",
-                "name"
+                "name",
+                "order"
             ],
             "properties": {
                 "content": {
@@ -622,6 +623,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "order": {
+                    "type": "integer"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -645,6 +649,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "order": {
+                    "type": "integer"
                 }
             }
         },
@@ -673,7 +680,8 @@
                 "content",
                 "courseId",
                 "durationMinutes",
-                "name"
+                "name",
+                "order"
             ],
             "properties": {
                 "content": {
@@ -687,6 +695,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "order": {
+                    "type": "integer"
                 }
             }
         },
