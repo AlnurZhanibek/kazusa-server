@@ -50,6 +50,8 @@ definitions:
         type: integer
       id:
         type: string
+      isCompleted:
+        type: boolean
       name:
         type: string
       order:
@@ -79,6 +81,19 @@ definitions:
         type: integer
     required:
     - id
+    type: object
+  NewActivity:
+    properties:
+      courseId:
+        type: string
+      moduleId:
+        type: string
+      userId:
+        type: string
+    required:
+    - courseId
+    - moduleId
+    - userId
     type: object
   NewCourse:
     properties:
@@ -229,6 +244,31 @@ info:
   title: Swagger KazUSA API
   version: "1.0"
 paths:
+  /activity:
+    post:
+      consumes:
+      - application/json
+      description: create activity
+      operationId: activity.create
+      parameters:
+      - description: new course body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/NewActivity'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      summary: Create activity
   /course:
     delete:
       consumes:

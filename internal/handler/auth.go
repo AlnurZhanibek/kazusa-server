@@ -65,6 +65,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    token,
+		Path:     "/",
 		Expires:  time.Now().Add(time.Hour * 24),
 		Secure:   true,
 		HttpOnly: true,
@@ -130,6 +131,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		Name:     "token",
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 24),
+		Path:     "/",
 		Secure:   true,
 		HttpOnly: true,
 	})

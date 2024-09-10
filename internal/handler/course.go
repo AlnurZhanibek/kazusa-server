@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
 	"github.com/AlnurZhanibek/kazusa-server/internal/service"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -91,7 +94,23 @@ func (h *CourseHandler) Read(w http.ResponseWriter, r *http.Request) {
 		filters.ID = uuid.MustParse(id)
 	}
 
-	courses, err := h.service.Read(entity.Pagination{
+	ctx := r.Context()
+
+	tokenCookie, err := r.Cookie("token")
+	if tokenCookie != nil {
+		token := new(jwt.Token)
+		token, err = jwt.ParseWithClaims(tokenCookie.Value, &service.Claims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWT_KEY")), nil
+		})
+		claims, ok := token.Claims.(*service.Claims)
+		if !ok || !token.Valid {
+			http.Error(w, "error parsing jwt token", http.StatusBadRequest)
+
+		}
+		ctx = context.WithValue(ctx, "user_id", claims.UserID)
+	}
+
+	courses, err := h.service.Read(ctx, entity.Pagination{
 		Offset: offset,
 		Limit:  limit,
 	}, filters)

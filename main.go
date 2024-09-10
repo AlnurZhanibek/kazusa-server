@@ -27,14 +27,6 @@ func main() {
 	db := database.New()
 	defer db.Close()
 
-	moduleRepo := repository.NewModuleRepo(db)
-	moduleService := service.NewModuleService(moduleRepo)
-	moduleHandler := handler.NewModuleHandler(moduleService)
-
-	courseRepo := repository.NewCourseRepo(db)
-	courseService := service.NewCourseService(courseRepo, moduleRepo)
-	courseHandler := handler.NewCourseHandler(courseService)
-
 	userRepo := repository.NewUserRepo(db)
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
@@ -42,10 +34,23 @@ func main() {
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
+	activityRepo := repository.NewActivityRepository(db)
+	activityService := service.NewActivityService(activityRepo)
+	activityHandler := handler.NewActivityHandler(activityService)
+
+	moduleRepo := repository.NewModuleRepo(db)
+	moduleService := service.NewModuleService(moduleRepo, activityService)
+	moduleHandler := handler.NewModuleHandler(moduleService)
+
+	courseRepo := repository.NewCourseRepo(db)
+	courseService := service.NewCourseService(courseRepo, moduleService)
+	courseHandler := handler.NewCourseHandler(courseService)
+
 	server.Start(&server.Handlers{
-		CourseHandler: courseHandler,
-		ModuleHandler: moduleHandler,
-		UserHandler:   userHandler,
-		AuthHandler:   authHandler,
+		CourseHandler:   courseHandler,
+		ModuleHandler:   moduleHandler,
+		UserHandler:     userHandler,
+		AuthHandler:     authHandler,
+		ActivityHandler: activityHandler,
 	})
 }

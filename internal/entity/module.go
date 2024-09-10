@@ -14,6 +14,7 @@ type Module struct {
 	Content         string    `db:"content" json:"content" validate:"required"`
 	Order           int64     `db:"order_number" json:"order" validate:"required"`
 	DurationMinutes int64     `db:"duration_minutes" json:"durationMinutes" validate:"required"`
+	IsCompleted     bool      `json:"isCompleted"`
 } // @name Module
 
 type NewModule struct {

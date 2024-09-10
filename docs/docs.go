@@ -24,6 +24,44 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/activity": {
+            "post": {
+                "description": "create activity",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create activity",
+                "operationId": "activity.create",
+                "parameters": [
+                    {
+                        "description": "new course body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewActivity"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "/course": {
             "get": {
                 "description": "read courses",
@@ -627,6 +665,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "isCompleted": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -658,6 +699,25 @@ const docTemplate = `{
                 },
                 "order": {
                     "type": "integer"
+                }
+            }
+        },
+        "NewActivity": {
+            "type": "object",
+            "required": [
+                "courseId",
+                "moduleId",
+                "userId"
+            ],
+            "properties": {
+                "courseId": {
+                    "type": "string"
+                },
+                "moduleId": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
                 }
             }
         },

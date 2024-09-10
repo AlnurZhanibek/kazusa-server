@@ -25,15 +25,15 @@ func NewUserRepo(db *sql.DB) *UserRepository {
 	}
 }
 
-func (r *UserRepository) Create(user entity.NewUser) (bool, error) {
+func (r *UserRepository) Create(user entity.NewUser) (*uuid.UUID, error) {
 	newID := uuid.New()
 
 	_, err := r.db.Exec(userInsertStatement, newID, user.Email, user.Name, user.Phone, user.Password, user.Role)
 	if err != nil {
-		return false, fmt.Errorf("user repo error when adding new user: %v", err)
+		return nil, fmt.Errorf("user repo error when adding new user: %v", err)
 	}
 
-	return true, nil
+	return &newID, nil
 }
 
 func (r *UserRepository) Read(pagination entity.Pagination, filters entity.UserFilters) ([]entity.User, error) {

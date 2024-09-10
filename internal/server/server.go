@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"github.com/AlnurZhanibek/kazusa-server/internal/handler"
-	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"log"
 	"net/http"
@@ -11,10 +10,11 @@ import (
 )
 
 type Handlers struct {
-	CourseHandler *handler.CourseHandler
-	ModuleHandler *handler.ModuleHandler
-	UserHandler   *handler.UserHandler
-	AuthHandler   *handler.AuthHandler
+	CourseHandler   *handler.CourseHandler
+	ModuleHandler   *handler.ModuleHandler
+	UserHandler     *handler.UserHandler
+	AuthHandler     *handler.AuthHandler
+	ActivityHandler *handler.ActivityHandler
 }
 
 func Start(handlers *Handlers) {
@@ -61,6 +61,12 @@ func Start(handlers *Handlers) {
 		}
 	})
 
+	mux.HandleFunc("/activity", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			handlers.ActivityHandler.Create(w, r)
+		}
+	})
+
 	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			handlers.AuthHandler.Login(w, r)
@@ -77,9 +83,7 @@ func Start(handlers *Handlers) {
 		httpSwagger.URL("http://localhost:"+port+"/swagger/doc.json"),
 	))
 
-	muxHandler := cors.Default().Handler(mux)
-
-	err := http.ListenAndServe(fmt.Sprintf(":%v", port), muxHandler)
+	err := http.ListenAndServe(fmt.Sprintf(":%v", port), mux)
 	if err != nil {
 		log.Fatalf("server error: %v", err)
 	} else {

@@ -5,6 +5,7 @@ import (
 	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
 	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"os"
 	"time"
@@ -14,8 +15,9 @@ var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 type Claims struct {
 	jwt.StandardClaims
-	Name string      `json:"name"`
-	Role entity.Role `json:"role"`
+	UserID uuid.UUID   `json:"userId"`
+	Name   string      `json:"name"`
+	Role   entity.Role `json:"role"`
 }
 
 type AuthService struct {
@@ -54,8 +56,9 @@ func (s *AuthService) Login(email string, password string) (string, error) {
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 			Subject:   email,
 		},
-		Name: user.Name,
-		Role: user.Role,
+		UserID: user.ID,
+		Name:   user.Name,
+		Role:   user.Role,
 	})
 
 	tokenString, err := token.SignedString(jwtKey)
@@ -105,7 +108,7 @@ func (s *AuthService) Register(name string, email string, phone string, password
 		Password: hashedPassword,
 	}
 
-	_, err = s.userRepo.Create(newUser)
+	newID, err := s.userRepo.Create(newUser)
 	if err != nil {
 		return "", fmt.Errorf("auth service register error: %v", err)
 	}
@@ -115,8 +118,9 @@ func (s *AuthService) Register(name string, email string, phone string, password
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 			Subject:   email,
 		},
-		Name: name,
-		Role: "user",
+		UserID: *newID,
+		Name:   name,
+		Role:   "user",
 	})
 
 	tokenString, err := token.SignedString(jwtKey)

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
 	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
@@ -9,18 +10,18 @@ import (
 
 type CourseServiceImplementation interface {
 	Create(course entity.NewCourse) (bool, error)
-	Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error)
+	Read(ctx context.Context, pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error)
 	Update(body entity.CourseUpdateBody) (bool, error)
 	Delete(id uuid.UUID) (bool, error)
 }
 
 type CourseService struct {
-	repo       repository.CourseRepositoryImplementation
-	moduleRepo repository.ModuleRepositoryImplementation
+	repo          repository.CourseRepositoryImplementation
+	moduleService ModuleServiceImplementation
 }
 
-func NewCourseService(repo repository.CourseRepositoryImplementation, moduleRepo repository.ModuleRepositoryImplementation) *CourseService {
-	return &CourseService{repo: repo, moduleRepo: moduleRepo}
+func NewCourseService(repo repository.CourseRepositoryImplementation, moduleService ModuleServiceImplementation) *CourseService {
+	return &CourseService{repo: repo, moduleService: moduleService}
 }
 
 func (s *CourseService) Create(course entity.NewCourse) (bool, error) {
@@ -32,16 +33,16 @@ func (s *CourseService) Create(course entity.NewCourse) (bool, error) {
 	return ok, nil
 }
 
-func (s *CourseService) Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error) {
+func (s *CourseService) Read(ctx context.Context, pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error) {
 	courses, err := s.repo.Read(pagination, filters)
 	if err != nil {
 		return nil, fmt.Errorf("course service create error: %v", err)
 	}
 
 	if filters.ID != uuid.Nil || len(courses) == 1 {
-		modules, err := s.moduleRepo.Read(entity.ModuleFilters{
+		modules, err := s.moduleService.Read(ctx, entity.Pagination{}, entity.ModuleFilters{
 			CourseID: courses[0].ID,
-		}, entity.Pagination{})
+		})
 
 		if err != nil {
 			return nil, fmt.Errorf("course service get modules error: %v", err)

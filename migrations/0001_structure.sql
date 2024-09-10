@@ -18,6 +18,7 @@ create table if not exists modules (
     name varchar(256) not null,
     content longtext not null,
     duration_minutes integer not null,
+    primary key (id),
     foreign key (course_id) references courses (id)
 );
 

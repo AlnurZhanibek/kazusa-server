@@ -8,7 +8,7 @@ import (
 )
 
 type UserServiceImplementation interface {
-	Create(user entity.NewUser) (bool, error)
+	Create(user entity.NewUser) (*uuid.UUID, error)
 	Read(pagination entity.Pagination, filters entity.UserFilters) ([]entity.User, error)
 	Update(body entity.UserUpdateBody) (bool, error)
 	Delete(id uuid.UUID) (bool, error)
@@ -22,13 +22,13 @@ func NewUserService(repo *repository.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) Create(user entity.NewUser) (bool, error) {
-	ok, err := s.repo.Create(user)
+func (s *UserService) Create(user entity.NewUser) (*uuid.UUID, error) {
+	userID, err := s.repo.Create(user)
 	if err != nil {
-		return false, fmt.Errorf("user service create error: %v", err)
+		return nil, fmt.Errorf("user service create error: %v", err)
 	}
 
-	return ok, nil
+	return userID, nil
 }
 
 func (s *UserService) Read(pagination entity.Pagination, filters entity.UserFilters) ([]entity.User, error) {
