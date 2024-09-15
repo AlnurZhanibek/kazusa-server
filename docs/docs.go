@@ -37,7 +37,7 @@ const docTemplate = `{
                 "operationId": "activity.create",
                 "parameters": [
                     {
-                        "description": "new course body",
+                        "description": "new activity body",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -152,7 +152,7 @@ const docTemplate = `{
             "post": {
                 "description": "create course",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -161,13 +161,39 @@ const docTemplate = `{
                 "operationId": "course.create",
                 "parameters": [
                     {
-                        "description": "new course body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/NewCourse"
-                        }
+                        "type": "string",
+                        "description": "title",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "price",
+                        "name": "price",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "cover",
+                        "name": "cover",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "cover",
+                        "name": "attachments",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -585,6 +611,7 @@ const docTemplate = `{
         "Course": {
             "type": "object",
             "required": [
+                "coverUrl",
                 "createdAt",
                 "description",
                 "id",
@@ -592,6 +619,12 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
+                "attachmentUrls": {
+                    "type": "string"
+                },
+                "coverUrl": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -717,25 +750,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
-                    "type": "string"
-                }
-            }
-        },
-        "NewCourse": {
-            "type": "object",
-            "required": [
-                "description",
-                "price",
-                "title"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "integer"
-                },
-                "title": {
                     "type": "string"
                 }
             }

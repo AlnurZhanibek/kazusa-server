@@ -7,6 +7,7 @@ import (
 	"github.com/AlnurZhanibek/kazusa-server/internal/service"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
@@ -27,33 +28,77 @@ func NewCourseHandler(service service.CourseServiceImplementation) *CourseHandle
 	return &CourseHandler{service: service}
 }
 
+type CourseCreateBody struct {
+	Title       string
+	Description string
+	Price       int64
+	Cover       service.FileWithHeader
+	Attachments []service.FileWithHeader
+}
+
 // Create course
 //
 //	@Summary		Create course
 //	@Description	create course
 //	@ID				course.create
-//	@Accept			json
+//	@Accept			multipart/form-data
 //	@Produce		json
-//	@Param			request		body		entity.NewCourse	true "new course body"
-//	@Success		200			{boolean} boolean ok
-//	@Failure		400			{boolean} boolean ok
+//	@Param			title formData string true "title"
+//	@Param			description formData string	true "description"
+//	@Param			price formData number true "price"
+//	@Param			cover formData file	true "cover"
+//	@Param			attachments formData file true "cover"
+//	@Success		200 {boolean} boolean ok
+//	@Failure		400 {boolean} boolean ok
 //	@Router			/course [post]
 func (h *CourseHandler) Create(w http.ResponseWriter, r *http.Request) {
-	newCourse := entity.NewCourse{}
+	newCourse := CourseCreateBody{}
 
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&newCourse)
+	coverFile, coverHeader, err := r.FormFile("cover")
+	defer coverFile.Close()
+	cover := service.FileWithHeader{
+		Header: coverHeader,
+		File:   coverFile,
+	}
+
+	attachmentHeaders := r.MultipartForm.File["attachments"]
+	attachments := make([]service.FileWithHeader, len(attachmentHeaders))
+	for i, fh := range attachmentHeaders {
+		var file multipart.File
+		file, err = fh.Open()
+		if err != nil {
+			http.Error(w, "error reading one of the attachments", http.StatusUnprocessableEntity)
+			return
+		}
+		attachments[i] = service.FileWithHeader{
+			Header: fh,
+			File:   file,
+		}
+	}
+	newCourse.Title = r.FormValue("title")
+	newCourse.Description = r.FormValue("description")
+	priceInt, err := strconv.Atoi(r.FormValue("price"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		http.Error(w, "price should be a number", http.StatusUnprocessableEntity)
 		return
 	}
+	newCourse.Price = int64(priceInt)
+	newCourse.Cover = cover
+	newCourse.Attachments = attachments
 
 	if newCourse.Title == "" || newCourse.Description == "" || newCourse.Price == 0 {
 		http.Error(w, "title, description or price is empty!", http.StatusUnprocessableEntity)
 		return
 	}
 
-	ok, err := h.service.Create(newCourse)
+	ok, err := h.service.Create(service.CourseCreateBody{
+		Title:       newCourse.Title,
+		Description: newCourse.Description,
+		Price:       newCourse.Price,
+		Cover:       newCourse.Cover,
+		Attachments: newCourse.Attachments,
+	})
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

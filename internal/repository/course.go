@@ -2,22 +2,24 @@ package repository
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
 	"github.com/google/uuid"
 	"strings"
+	"time"
 )
 
 const (
-	courseInsertStatement = "insert into courses(id, title, description, price) values(uuid_to_bin(?), ?, ?, ?)"
-	courseSelectStatement = "select id, created_at, updated_at, title, description, price from courses"
+	courseInsertStatement = "insert into courses(id, title, description, price, cover_url, attachment_urls) values(uuid_to_bin(?), ?, ?, ?, ?, ?)"
+	courseSelectStatement = "select id, created_at, updated_at, title, description, price, cover_url, attachment_urls from courses"
 	courseUpdateStatement = "update courses set "
 	courseDeleteStatement = "delete from courses where id = uuid_to_bin(?)"
 )
 
 type CourseRepositoryImplementation interface {
-	Create(course entity.NewCourse) (bool, error)
-	Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error)
+	Create(course CourseCreateBody) (bool, error)
+	Read(pagination entity.Pagination, filters entity.CourseFilters) ([]Course, error)
 	Update(body entity.CourseUpdateBody) (bool, error)
 	Delete(id uuid.UUID) (bool, error)
 }
@@ -32,10 +34,25 @@ func NewCourseRepo(db *sql.DB) *CourseRepository {
 	}
 }
 
-func (r *CourseRepository) Create(course entity.NewCourse) (bool, error) {
+type CourseCreateBody struct {
+	Title          string
+	Description    string
+	Price          int64
+	CoverURL       string
+	AttachmentURLs []string
+}
+
+func (r *CourseRepository) Create(course CourseCreateBody) (bool, error) {
 	newID := uuid.New()
 
-	_, err := r.db.Exec(courseInsertStatement, newID, course.Title, course.Description, course.Price)
+	attachmentsURLs := struct {
+		AttachmentURLs []string `json:"attachment_urls"`
+	}{
+		AttachmentURLs: course.AttachmentURLs,
+	}
+	attachmentsURLsJSON, err := json.Marshal(attachmentsURLs)
+
+	_, err = r.db.Exec(courseInsertStatement, newID, course.Title, course.Description, course.Price, course.CoverURL, attachmentsURLsJSON)
 	if err != nil {
 		return false, fmt.Errorf("course repo error when adding new course: %v", err)
 	}
@@ -43,8 +60,19 @@ func (r *CourseRepository) Create(course entity.NewCourse) (bool, error) {
 	return true, nil
 }
 
-func (r *CourseRepository) Read(pagination entity.Pagination, filters entity.CourseFilters) ([]entity.Course, error) {
-	courses := make([]entity.Course, 0, pagination.Limit)
+type Course struct {
+	ID             uuid.UUID      `db:"id"`
+	CreatedAt      time.Time      `db:"created_at"`
+	UpdatedAt      time.Time      `db:"updated_at"`
+	Title          string         `db:"title"`
+	Description    string         `db:"description"`
+	Price          int64          `db:"price"`
+	CoverURL       string         `db:"cover_url"`
+	AttachmentURLs sql.NullString `db:"attachment_urls"`
+}
+
+func (r *CourseRepository) Read(pagination entity.Pagination, filters entity.CourseFilters) ([]Course, error) {
+	courses := make([]Course, 0, pagination.Limit)
 
 	statement := courseSelectStatement
 	args := make([]any, 0, 3)
@@ -73,9 +101,9 @@ func (r *CourseRepository) Read(pagination entity.Pagination, filters entity.Cou
 	defer rows.Close()
 
 	for rows.Next() {
-		course := entity.Course{}
+		course := Course{}
 
-		err = rows.Scan(&course.ID, &course.CreatedAt, &course.UpdatedAt, &course.Title, &course.Description, &course.Price)
+		err = rows.Scan(&course.ID, &course.CreatedAt, &course.UpdatedAt, &course.Title, &course.Description, &course.Price, &course.CoverURL, &course.AttachmentURLs)
 		if err != nil {
 			return nil, fmt.Errorf("course repo error on scanning a course: %v", err)
 		}

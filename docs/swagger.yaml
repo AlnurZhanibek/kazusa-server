@@ -2,6 +2,10 @@ basePath: /
 definitions:
   Course:
     properties:
+      attachmentUrls:
+        type: string
+      coverUrl:
+        type: string
       createdAt:
         type: string
       description:
@@ -19,6 +23,7 @@ definitions:
       updatedAt:
         type: string
     required:
+    - coverUrl
     - createdAt
     - description
     - id
@@ -94,19 +99,6 @@ definitions:
     - courseId
     - moduleId
     - userId
-    type: object
-  NewCourse:
-    properties:
-      description:
-        type: string
-      price:
-        type: integer
-      title:
-        type: string
-    required:
-    - description
-    - price
-    - title
     type: object
   NewModule:
     properties:
@@ -251,7 +243,7 @@ paths:
       description: create activity
       operationId: activity.create
       parameters:
-      - description: new course body
+      - description: new activity body
         in: body
         name: request
         required: true
@@ -329,16 +321,35 @@ paths:
       summary: Read courses
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: create course
       operationId: course.create
       parameters:
-      - description: new course body
-        in: body
-        name: request
+      - description: title
+        in: formData
+        name: title
         required: true
-        schema:
-          $ref: '#/definitions/NewCourse'
+        type: string
+      - description: description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: price
+        in: formData
+        name: price
+        required: true
+        type: number
+      - description: cover
+        in: formData
+        name: cover
+        required: true
+        type: file
+      - description: cover
+        in: formData
+        name: attachments
+        required: true
+        type: file
       produces:
       - application/json
       responses:

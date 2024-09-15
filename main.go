@@ -42,8 +42,10 @@ func main() {
 	moduleService := service.NewModuleService(moduleRepo, activityService)
 	moduleHandler := handler.NewModuleHandler(moduleService)
 
+	fileService := service.NewFileService()
+
 	courseRepo := repository.NewCourseRepo(db)
-	courseService := service.NewCourseService(courseRepo, moduleService)
+	courseService := service.NewCourseService(courseRepo, moduleService, fileService)
 	courseHandler := handler.NewCourseHandler(courseService)
 
 	server.Start(&server.Handlers{

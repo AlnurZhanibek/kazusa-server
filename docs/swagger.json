@@ -31,7 +31,7 @@
                 "operationId": "activity.create",
                 "parameters": [
                     {
-                        "description": "new course body",
+                        "description": "new activity body",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -146,7 +146,7 @@
             "post": {
                 "description": "create course",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -155,13 +155,39 @@
                 "operationId": "course.create",
                 "parameters": [
                     {
-                        "description": "new course body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/NewCourse"
-                        }
+                        "type": "string",
+                        "description": "title",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "price",
+                        "name": "price",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "cover",
+                        "name": "cover",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "cover",
+                        "name": "attachments",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -579,6 +605,7 @@
         "Course": {
             "type": "object",
             "required": [
+                "coverUrl",
                 "createdAt",
                 "description",
                 "id",
@@ -586,6 +613,12 @@
                 "title"
             ],
             "properties": {
+                "attachmentUrls": {
+                    "type": "string"
+                },
+                "coverUrl": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -711,25 +744,6 @@
                     "type": "string"
                 },
                 "userId": {
-                    "type": "string"
-                }
-            }
-        },
-        "NewCourse": {
-            "type": "object",
-            "required": [
-                "description",
-                "price",
-                "title"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "integer"
-                },
-                "title": {
                     "type": "string"
                 }
             }
