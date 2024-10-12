@@ -58,10 +58,10 @@ func (s *ModuleService) Read(ctx context.Context, pagination entity.Pagination, 
 			return nil, fmt.Errorf("module service read error when adding activity: %v", actErr)
 		}
 
-		for _, module := range modules {
-			for _, activity := range activities {
-				if module.ID == activity.ModuleID {
-					module.IsCompleted = true
+		for i := range modules {
+			for j := range activities {
+				if modules[i].ID == activities[j].ModuleID {
+					modules[i].IsCompleted = true
 				}
 			}
 		}
