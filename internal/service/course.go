@@ -19,13 +19,14 @@ type CourseServiceImplementation interface {
 }
 
 type CourseService struct {
-	repo          repository.CourseRepositoryImplementation
-	moduleService ModuleServiceImplementation
-	fileService   *FileService
+	repo           repository.CourseRepositoryImplementation
+	moduleService  ModuleServiceImplementation
+	fileService    *FileService
+	paymentService *PaymentService
 }
 
-func NewCourseService(repo repository.CourseRepositoryImplementation, moduleService ModuleServiceImplementation, fileService *FileService) *CourseService {
-	return &CourseService{repo: repo, moduleService: moduleService, fileService: fileService}
+func NewCourseService(repo repository.CourseRepositoryImplementation, moduleService ModuleServiceImplementation, fileService *FileService, paymentService *PaymentService) *CourseService {
+	return &CourseService{repo: repo, moduleService: moduleService, fileService: fileService, paymentService: paymentService}
 }
 
 type FileWithHeader struct {
@@ -106,6 +107,22 @@ func (s *CourseService) Read(ctx context.Context, pagination entity.Pagination, 
 		}
 
 		courses[0].Modules = &modules
+
+		userIDCtx := ctx.Value("user_id")
+		if userIDCtx != nil {
+			userID := userIDCtx.(uuid.UUID)
+			payment := &Payment{}
+			payment, _ = s.paymentService.Read(PaymentFilters{
+				UserID:   &userID,
+				CourseID: &filters.ID,
+			})
+
+			if payment != nil {
+				courses[0].IsPaid = true
+			} else {
+				courses[0].IsPaid = false
+			}
+		}
 	}
 
 	return courses, nil

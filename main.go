@@ -38,6 +38,10 @@ func main() {
 	activityService := service.NewActivityService(activityRepo)
 	activityHandler := handler.NewActivityHandler(activityService)
 
+	paymentRepo := repository.NewPaymentRepository(db)
+	paymentService := service.NewPaymentService(paymentRepo)
+	paymentHandler := handler.NewPaymentHandler(paymentService)
+
 	moduleRepo := repository.NewModuleRepo(db)
 	moduleService := service.NewModuleService(moduleRepo, activityService)
 	moduleHandler := handler.NewModuleHandler(moduleService)
@@ -45,7 +49,7 @@ func main() {
 	fileService := service.NewFileService()
 
 	courseRepo := repository.NewCourseRepo(db)
-	courseService := service.NewCourseService(courseRepo, moduleService, fileService)
+	courseService := service.NewCourseService(courseRepo, moduleService, fileService, paymentService)
 	courseHandler := handler.NewCourseHandler(courseService)
 
 	server.Start(&server.Handlers{
@@ -54,5 +58,6 @@ func main() {
 		UserHandler:     userHandler,
 		AuthHandler:     authHandler,
 		ActivityHandler: activityHandler,
+		PaymentHandler:  paymentHandler,
 	})
 }

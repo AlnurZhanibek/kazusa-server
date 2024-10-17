@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	INSERT_STATEMENT = "insert into user_activity(id, user_id, course_id, module_id) values(uuid_to_bin(?), uuid_to_bin(?), uuid_to_bin(?), uuid_to_bin(?))"
-	SELECT_STATEMENT = "select id, user_id, course_id, module_id from user_activity"
+	ACTIVITY_INSERT_STATEMENT = "insert into user_activity(id, user_id, course_id, module_id) values(uuid_to_bin(?), uuid_to_bin(?), uuid_to_bin(?), uuid_to_bin(?))"
+	ACTIVITY_SELECT_STATEMENT = "select id, user_id, course_id, module_id from user_activity"
 )
 
 type ActivityRepository struct {
@@ -29,7 +29,7 @@ type ActivityCreateBody struct {
 func (r *ActivityRepository) Create(activity *ActivityCreateBody) error {
 	newID := uuid.New()
 
-	_, err := r.db.Exec(INSERT_STATEMENT, newID, activity.UserID, activity.CourseID, activity.ModuleID)
+	_, err := r.db.Exec(ACTIVITY_INSERT_STATEMENT, newID, activity.UserID, activity.CourseID, activity.ModuleID)
 	if err != nil {
 		return fmt.Errorf("activity repo error when adding new course: %v", err)
 	}
@@ -57,7 +57,7 @@ func (r *ActivityRepository) Read(filters *ActivityFilters) ([]*Activity, error)
 
 	activities := make([]*Activity, 0)
 
-	statement := SELECT_STATEMENT
+	statement := ACTIVITY_SELECT_STATEMENT
 	statement += " where "
 	args := make([]any, 0, 3)
 

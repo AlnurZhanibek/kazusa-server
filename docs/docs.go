@@ -634,6 +634,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "isPaid": {
+                    "type": "boolean"
+                },
                 "modules": {
                     "type": "array",
                     "items": {

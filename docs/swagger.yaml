@@ -12,6 +12,8 @@ definitions:
         type: string
       id:
         type: string
+      isPaid:
+        type: boolean
       modules:
         items:
           $ref: '#/definitions/Module'

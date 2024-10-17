@@ -15,6 +15,7 @@ type Handlers struct {
 	UserHandler     *handler.UserHandler
 	AuthHandler     *handler.AuthHandler
 	ActivityHandler *handler.ActivityHandler
+	PaymentHandler  *handler.PaymentHandler
 }
 
 func Start(handlers *Handlers) {
@@ -64,6 +65,12 @@ func Start(handlers *Handlers) {
 	mux.HandleFunc("/activity", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			handlers.ActivityHandler.Create(w, r)
+		}
+	})
+
+	mux.HandleFunc("/payment", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			handlers.PaymentHandler.Create(w, r)
 		}
 	})
 

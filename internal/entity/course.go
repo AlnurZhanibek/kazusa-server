@@ -14,7 +14,8 @@ type Course struct {
 	Price          int64     `db:"price" json:"price" validate:"required"`
 	CoverURL       string    `db:"cover_url" json:"coverUrl" validate:"required"`
 	AttachmentURLs string    `db:"attachment_urls" json:"attachmentUrls"`
-	Modules        *[]Module `db:"modules" json:"modules"`
+	Modules        *[]Module `json:"modules"`
+	IsPaid         bool      `json:"isPaid"`
 } // @name Course
 
 type CourseUpdateBody struct {

@@ -64,3 +64,33 @@ func (s *ActivityService) Read(filters ActivityFilters) ([]Activity, error) {
 
 	return activities, nil
 }
+
+type Payment struct {
+	ID       uuid.UUID
+	UserID   uuid.UUID
+	CourseID uuid.UUID
+} // @name Payment
+
+type PaymentFilters struct {
+	UserID   *uuid.UUID
+	CourseID *uuid.UUID
+}
+
+func (s *PaymentService) Read(filters PaymentFilters) (*Payment, error) {
+	repoPayment, err := s.repo.Read(&repository.PaymentFilters{
+		UserID:   filters.UserID,
+		CourseID: filters.CourseID,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("service error when reading activity: %v", err)
+	}
+
+	payment := &Payment{
+		ID:       repoPayment.ID,
+		UserID:   repoPayment.UserID,
+		CourseID: repoPayment.CourseID,
+	}
+
+	return payment, nil
+}
