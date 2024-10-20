@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
 	"github.com/google/uuid"
 )
@@ -23,4 +24,39 @@ func (s *PaymentService) Create(payment *PaymentCreateBody) error {
 		UserID:   payment.UserID,
 		CourseID: payment.CourseID,
 	})
+}
+
+type Payment struct {
+	ID       uuid.UUID
+	UserID   uuid.UUID
+	CourseID uuid.UUID
+} // @name Payment
+
+type PaymentFilters struct {
+	UserID   *uuid.UUID
+	CourseID *uuid.UUID
+}
+
+func (s *PaymentService) Read(filters PaymentFilters) (*Payment, error) {
+	repoPayment, err := s.repo.Read(&repository.PaymentFilters{
+		UserID:   filters.UserID,
+		CourseID: filters.CourseID,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("service error when reading activity: %v", err)
+	}
+
+	payment := &Payment{}
+	if repoPayment != nil {
+		payment = &Payment{
+			ID:       repoPayment.ID,
+			UserID:   repoPayment.UserID,
+			CourseID: repoPayment.CourseID,
+		}
+	} else {
+		payment = nil
+	}
+
+	return payment, nil
 }
