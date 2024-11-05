@@ -132,7 +132,7 @@ func (r *ModuleRepository) Update(body entity.ModuleUpdateBody) (bool, error) {
 
 	if body.Order != nil {
 		statement += "order_number = ?, "
-		args = append(args, body.DurationMinutes)
+		args = append(args, body.Order)
 	}
 
 	if body.DurationMinutes != nil {
