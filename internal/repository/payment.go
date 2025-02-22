@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"log"
 )
 
 const (
@@ -43,6 +44,8 @@ func (r *PaymentRepository) Confirm(orderID uuid.UUID) error {
 	if err != nil {
 		return fmt.Errorf("payment repo error when confirming: %v", err)
 	}
+
+	log.Printf("payment for order %v was confirmed successfully", orderID)
 
 	return nil
 }

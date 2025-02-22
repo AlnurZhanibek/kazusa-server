@@ -64,6 +64,7 @@ func (h *PaymentHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 type PaymentConfirmBody struct {
 	OrderID uuid.UUID `json:"order_id"`
+	Status  string    `json:"operation_status"`
 }
 type ConfirmResponse struct {
 	OK    bool   `json:"ok"`
@@ -78,6 +79,15 @@ func (h *PaymentHandler) Confirm(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(ConfirmResponse{
 			OK:    false,
 			Error: err.Error(),
+		})
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if body.Status != "success" {
+		json.NewEncoder(w).Encode(ConfirmResponse{
+			OK:    false,
+			Error: "payment confirmation was not successful",
 		})
 		w.WriteHeader(http.StatusBadRequest)
 		return
