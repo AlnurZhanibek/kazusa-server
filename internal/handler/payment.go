@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"github.com/AlnurZhanibek/kazusa-server/internal/service"
 	"github.com/google/uuid"
@@ -64,6 +65,9 @@ func (h *PaymentHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 type PaymentConfirmBody struct {
+	Data string `json:"data"`
+}
+type PaymentData struct {
 	OrderID uuid.UUID `json:"order_id"`
 	Status  string    `json:"operation_status"`
 }
@@ -77,6 +81,29 @@ func (h *PaymentHandler) Confirm(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
+		json.NewEncoder(w).Encode(CreateResponse{
+			OK:    false,
+			Error: err.Error(),
+		})
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	data, err := base64.StdEncoding.DecodeString(body.Data)
+	if err != nil {
+		log.Printf("error decoding base64 data %v", err)
+		json.NewEncoder(w).Encode(ConfirmResponse{
+			OK:    false,
+			Error: err.Error(),
+		})
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	log.Print(data)
+
+	paymentData := new(PaymentData)
+	err = json.Unmarshal(data, paymentData)
+	if err != nil {
 		json.NewEncoder(w).Encode(ConfirmResponse{
 			OK:    false,
 			Error: err.Error(),
@@ -85,8 +112,8 @@ func (h *PaymentHandler) Confirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if body.Status != "success" {
-		log.Printf("payment confirmation for %v was not successful: %v", body.OrderID.String(), body.Status)
+	if paymentData.Status != "success" {
+		log.Printf("payment confirmation for %v was not successful: %v", paymentData.OrderID, paymentData.Status)
 		json.NewEncoder(w).Encode(ConfirmResponse{
 			OK:    false,
 			Error: "payment confirmation was not successful",
@@ -95,7 +122,7 @@ func (h *PaymentHandler) Confirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.service.Confirm(body.OrderID)
+	err = h.service.Confirm(paymentData.OrderID)
 	if err != nil {
 		json.NewEncoder(w).Encode(ConfirmResponse{
 			OK:    false,
