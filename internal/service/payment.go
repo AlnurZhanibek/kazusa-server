@@ -17,12 +17,14 @@ func NewPaymentService(repo *repository.PaymentRepository) *PaymentService {
 type PaymentCreateBody struct {
 	UserID   uuid.UUID
 	CourseID uuid.UUID
+	OrderID  uuid.UUID
 }
 
 func (s *PaymentService) Create(payment *PaymentCreateBody) error {
 	return s.repo.Create(&repository.PaymentCreateBody{
 		UserID:   payment.UserID,
 		CourseID: payment.CourseID,
+		OrderID:  payment.OrderID,
 	})
 }
 
@@ -59,4 +61,8 @@ func (s *PaymentService) Read(filters PaymentFilters) (*Payment, error) {
 	}
 
 	return payment, nil
+}
+
+func (s *PaymentService) Confirm(orderID uuid.UUID) error {
+	return s.repo.Confirm(orderID)
 }

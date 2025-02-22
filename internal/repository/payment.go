@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"strings"
 )
 
 const (
-	PAYMENT_INSERT_STATEMENT = "insert into course_payments(id, user_id, course_id) values(uuid_to_bin(?), uuid_to_bin(?), uuid_to_bin(?))"
-	PAYMENT_SELECT_STATEMENT = "select id, user_id, course_id from course_payments"
+	PAYMENT_INSERT_STATEMENT  = "insert into course_payments(id, user_id, course_id, order_id) values(uuid_to_bin(?), uuid_to_bin(?), uuid_to_bin(?), uuid_to_bin(?))"
+	PAYMENT_SELECT_STATEMENT  = "select id, user_id, course_id from course_payments"
+	CONFIRM_PAYMENT_STATEMENT = "update course_payments set confirmed=1 where order_id=uuid_to_bin(?)"
 )
 
 type PaymentRepository struct {
@@ -24,14 +24,24 @@ func NewPaymentRepository(db *sql.DB) *PaymentRepository {
 type PaymentCreateBody struct {
 	UserID   uuid.UUID `db:"user_id"`
 	CourseID uuid.UUID `db:"course_id"`
+	OrderID  uuid.UUID `db:"order_id"`
 }
 
 func (r *PaymentRepository) Create(payment *PaymentCreateBody) error {
 	newID := uuid.New()
 
-	_, err := r.db.Exec(PAYMENT_INSERT_STATEMENT, newID, payment.UserID, payment.CourseID)
+	_, err := r.db.Exec(PAYMENT_INSERT_STATEMENT, newID, payment.UserID, payment.CourseID, payment.OrderID)
 	if err != nil {
 		return fmt.Errorf("payment repo error when adding new course: %v", err)
+	}
+
+	return nil
+}
+
+func (r *PaymentRepository) Confirm(orderID uuid.UUID) error {
+	_, err := r.db.Exec(CONFIRM_PAYMENT_STATEMENT, orderID)
+	if err != nil {
+		return fmt.Errorf("payment repo error when confirming: %v", err)
 	}
 
 	return nil
@@ -67,7 +77,7 @@ func (r *PaymentRepository) Read(filters *PaymentFilters) (*Payment, error) {
 		statement += "course_id = uuid_to_bin(?) and "
 		args = append(args, *filters.CourseID)
 	}
-	statement = strings.TrimSuffix(statement, " and ")
+	statement += "confirmed = 1"
 
 	row := r.db.QueryRow(statement, args...)
 	err := row.Scan(&payment.ID, &payment.UserID, &payment.CourseID)

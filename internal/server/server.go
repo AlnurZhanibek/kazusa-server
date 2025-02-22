@@ -68,6 +68,12 @@ func Start(handlers *Handlers) {
 		}
 	})
 
+	mux.HandleFunc("/payment/confirm", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			handlers.PaymentHandler.Confirm(w, r)
+		}
+	})
+
 	mux.HandleFunc("/payment", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			handlers.PaymentHandler.Create(w, r)
