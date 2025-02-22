@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/AlnurZhanibek/kazusa-server/internal/service"
 	"github.com/google/uuid"
+	"log"
 	"net/http"
 )
 
@@ -85,6 +86,7 @@ func (h *PaymentHandler) Confirm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if body.Status != "success" {
+		log.Printf("payment confirmation for %v was not successful: %v", body.OrderID.String(), body.Status)
 		json.NewEncoder(w).Encode(ConfirmResponse{
 			OK:    false,
 			Error: "payment confirmation was not successful",
@@ -103,6 +105,7 @@ func (h *PaymentHandler) Confirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(CreateResponse{
 		OK:    true,
 		Error: "",
