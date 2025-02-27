@@ -93,13 +93,24 @@ definitions:
     properties:
       courseId:
         type: string
+      courseName:
+        type: string
+      isLast:
+        type: boolean
       moduleId:
+        type: string
+      userEmail:
+        type: string
+      userFullname:
         type: string
       userId:
         type: string
     required:
     - courseId
+    - courseName
     - moduleId
+    - userEmail
+    - userFullname
     - userId
     type: object
   NewModule:

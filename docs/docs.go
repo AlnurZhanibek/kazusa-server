@@ -742,14 +742,29 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "courseId",
+                "courseName",
                 "moduleId",
+                "userEmail",
+                "userFullname",
                 "userId"
             ],
             "properties": {
                 "courseId": {
                     "type": "string"
                 },
+                "courseName": {
+                    "type": "string"
+                },
+                "isLast": {
+                    "type": "boolean"
+                },
                 "moduleId": {
+                    "type": "string"
+                },
+                "userEmail": {
+                    "type": "string"
+                },
+                "userFullname": {
                     "type": "string"
                 },
                 "userId": {

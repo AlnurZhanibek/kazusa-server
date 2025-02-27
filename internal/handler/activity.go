@@ -16,9 +16,13 @@ func NewActivityHandler(service *service.ActivityService) *ActivityHandler {
 }
 
 type NewActivity struct {
-	UserID   uuid.UUID `json:"userId" validate:"required"`
-	CourseID uuid.UUID `json:"courseId" validate:"required"`
-	ModuleID uuid.UUID `json:"moduleId" validate:"required"`
+	UserID       uuid.UUID `json:"userId" validate:"required"`
+	UserEmail    string    `json:"userEmail" validate:"required"`
+	UserFullname string    `json:"userFullname" validate:"required"`
+	CourseID     uuid.UUID `json:"courseId" validate:"required"`
+	CourseName   string    `json:"courseName" validate:"required"`
+	ModuleID     uuid.UUID `json:"moduleId" validate:"required"`
+	IsLast       *bool     `json:"isLast"`
 } // @name NewActivity
 
 // Create activity
@@ -47,9 +51,13 @@ func (h *ActivityHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.service.Create(&service.ActivityCreateBody{
-		UserID:   newActivity.UserID,
-		CourseID: newActivity.CourseID,
-		ModuleID: newActivity.ModuleID,
+		UserID:       newActivity.UserID,
+		UserEmail:    newActivity.UserEmail,
+		UserFullname: newActivity.UserFullname,
+		CourseID:     newActivity.CourseID,
+		CourseName:   newActivity.CourseName,
+		ModuleID:     newActivity.ModuleID,
+		IsLast:       newActivity.IsLast,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
