@@ -1,53 +1,50 @@
 package service
 
 import (
+	"context"
+	"fmt"
 	"mime/multipart"
 	"os"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 type FileService struct {
-	client *s3.S3
+	client *s3.Client
+	bucket string
 }
 
-func NewFileService() *FileService {
-	key := os.Getenv("S3_KEY")
-	secret := os.Getenv("S3_SECRET")
+func NewFileService(ctx context.Context) (*FileService, error) {
+	region := os.Getenv("AWS_REGION")
+	bucket := os.Getenv("S3_BUCKET")
 
-	s3Config := &aws.Config{
-		Credentials:      credentials.NewStaticCredentials(key, secret, ""),
-		Endpoint:         aws.String(os.Getenv("S3_ENDPOINT")),
-		S3ForcePathStyle: aws.Bool(false),
-		Region:           aws.String("eu-central-1"),
-	}
-
-	newSession := session.New(s3Config)
-	s3Client := s3.New(newSession)
-
-	return &FileService{client: s3Client}
-}
-
-func (fs *FileService) Put(filename string, file multipart.File) (*string, error) {
-	object := s3.PutObjectInput{
-		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-		Key:    aws.String(filename),
-		Body:   file,
-		ACL:    aws.String("public-read"),
-		Metadata: map[string]*string{
-			"x-amz-meta-my-key": aws.String(filename),
-		},
-	}
-
-	_, err := fs.client.PutObject(&object)
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load AWS config: %w", err)
 	}
 
-	url := os.Getenv("S3_CDN_ENDPOINT") + "/" + filename
+	client := s3.NewFromConfig(cfg)
 
-	return &url, nil
+	return &FileService{
+		client: client,
+		bucket: bucket,
+	}, nil
+}
+
+func (fs *FileService) Put(ctx context.Context, key string, r multipart.File) (*string, error) {
+	_, err := fs.client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: aws.String(fs.bucket),
+		Key:    aws.String(key),
+		Body:   r,
+	})
+
+	fileURL := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s",
+		os.Getenv("S3_BUCKET"),
+		os.Getenv("AWS_REGION"),
+		key,
+	)
+
+	return &fileURL, err
 }

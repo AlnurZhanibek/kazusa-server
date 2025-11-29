@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
-	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
-	"github.com/google/uuid"
 	"mime/multipart"
 	"path/filepath"
 	"strings"
+
+	"github.com/AlnurZhanibek/kazusa-server/internal/entity"
+	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
+	"github.com/google/uuid"
 )
 
 type CourseServiceImplementation interface {
@@ -43,9 +44,11 @@ type CourseCreateBody struct {
 }
 
 func (s *CourseService) Create(course CourseCreateBody) (bool, error) {
+
+	ctx := context.Background()
 	coverFilename := strings.ToLower(strings.ReplaceAll(course.Title, " ", "-")) + "-cover" + filepath.Ext(course.Cover.Header.Filename)
 
-	coverUrl, err := s.fileService.Put(coverFilename, course.Cover.File)
+	coverUrl, err := s.fileService.Put(ctx, coverFilename, course.Cover.File)
 	if err != nil {
 		return false, fmt.Errorf("course service create error: uploading cover image")
 	}
@@ -54,7 +57,7 @@ func (s *CourseService) Create(course CourseCreateBody) (bool, error) {
 	for i, attachment := range course.Attachments {
 		filename := strings.ToLower(strings.ReplaceAll(attachment.Header.Filename, " ", "-"))
 		var url *string
-		url, err = s.fileService.Put(filename, attachment.File)
+		url, err = s.fileService.Put(ctx, filename, attachment.File)
 		if err != nil {
 			return false, fmt.Errorf("course service create error: uploading attachment")
 		}

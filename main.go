@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"log"
+
 	_ "github.com/AlnurZhanibek/kazusa-server/docs"
 	"github.com/AlnurZhanibek/kazusa-server/internal/database"
 	"github.com/AlnurZhanibek/kazusa-server/internal/handler"
@@ -24,6 +27,8 @@ import (
 // @host kazusa.kz
 // @BasePath /
 func main() {
+	ctx := context.Background()
+
 	db := database.New()
 	defer db.Close()
 
@@ -46,7 +51,10 @@ func main() {
 	moduleService := service.NewModuleService(moduleRepo, activityService)
 	moduleHandler := handler.NewModuleHandler(moduleService)
 
-	fileService := service.NewFileService()
+	fileService, err := service.NewFileService(ctx)
+	if err != nil {
+		log.Fatalf("failed to create file service: %v", err)
+	}
 
 	courseRepo := repository.NewCourseRepo(db)
 	courseService := service.NewCourseService(courseRepo, moduleService, fileService, paymentService)
