@@ -34,10 +34,8 @@ func main() {
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
-	emailService := service.NewEmailService()
-
 	activityRepo := repository.NewActivityRepository(db)
-	activityService := service.NewActivityService(activityRepo, emailService)
+	activityService := service.NewActivityService(activityRepo)
 	activityHandler := handler.NewActivityHandler(activityService)
 
 	paymentRepo := repository.NewPaymentRepository(db)

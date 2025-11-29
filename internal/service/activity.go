@@ -2,18 +2,17 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/AlnurZhanibek/kazusa-server/internal/repository"
 	"github.com/google/uuid"
-	"os"
 )
 
 type ActivityService struct {
-	repo         *repository.ActivityRepository
-	emailService *EmailService
+	repo *repository.ActivityRepository
 }
 
-func NewActivityService(repo *repository.ActivityRepository, emailService *EmailService) *ActivityService {
-	return &ActivityService{repo: repo, emailService: emailService}
+func NewActivityService(repo *repository.ActivityRepository) *ActivityService {
+	return &ActivityService{repo: repo}
 }
 
 type ActivityCreateBody struct {
@@ -27,12 +26,6 @@ type ActivityCreateBody struct {
 }
 
 func (s *ActivityService) Create(activity *ActivityCreateBody) error {
-	if activity.IsLast != nil && *activity.IsLast {
-		_ = s.emailService.SendEmail(os.Getenv("OWNER_EMAIL"), os.Getenv("OWNER_EMAIL"),
-			"Course completion", fmt.Sprintf("%v (%v) completed %v!",
-				activity.UserEmail, activity.UserFullname, activity.CourseName))
-	}
-
 	return s.repo.Create(&repository.ActivityCreateBody{
 		UserID:   activity.UserID,
 		CourseID: activity.CourseID,
